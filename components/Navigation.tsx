@@ -10,9 +10,10 @@ import { Profile } from '@/lib/types'
 
 interface NavigationProps {
   user?: Profile
+  showSignIn?: boolean
 }
 
-export function Navigation({ user }: NavigationProps) {
+export function Navigation({ user, showSignIn = true }: NavigationProps) {
   const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
@@ -79,11 +80,13 @@ export function Navigation({ user }: NavigationProps) {
                   </Button>
                 </>
               ) : (
-                <Link href="/login">
-                  <Button className="bg-100x-accent-primary hover:bg-100x-accent-primary/90 text-white transition-all duration-300">
-                    Sign In
-                  </Button>
-                </Link>
+                showSignIn && (
+                  <Link href="/login">
+                    <Button className="bg-100x-accent-primary hover:bg-100x-accent-primary/90 text-white transition-all duration-300">
+                      Sign In
+                    </Button>
+                  </Link>
+                )
               )}
             </div>
 
@@ -131,11 +134,13 @@ export function Navigation({ user }: NavigationProps) {
               </Button>
             </>
           ) : (
-            <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-              <Button className="w-full bg-100x-accent-primary hover:bg-100x-accent-primary/90 text-white">
-                Sign In
-              </Button>
-            </Link>
+            showSignIn && (
+              <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                <Button className="w-full bg-100x-accent-primary hover:bg-100x-accent-primary/90 text-white">
+                  Sign In
+                </Button>
+              </Link>
+            )
           )}
         </div>
       </div>

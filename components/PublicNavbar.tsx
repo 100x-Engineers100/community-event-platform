@@ -40,17 +40,12 @@ export function PublicNavbar() {
             {/* Desktop CTA Buttons */}
             <div className="hidden md:flex items-center gap-3">
               <Link href="/dashboard">
-                <Button
-                  variant="outline"
-                  className="border-100x-accent-primary text-100x-accent-primary hover:bg-100x-accent-primary hover:text-white transition-all duration-300"
-                >
-                  Become a Host
-                </Button>
+
               </Link>
 
               <Link href="/login">
                 <Button className="bg-100x-accent-primary hover:bg-100x-accent-primary/90 text-white transition-all duration-300">
-                  Sign In
+                  Become a Host
                 </Button>
               </Link>
             </div>

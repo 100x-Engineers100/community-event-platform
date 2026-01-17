@@ -121,7 +121,7 @@ export default function Home() {
 
 
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-100x-text-primary tracking-tight pointer-events-none">
-                100x Engineers
+                100xEngineers
                 <span className="block text-100x-accent-primary mt-3">
                   Community Events
                 </span>
@@ -139,7 +139,7 @@ export default function Home() {
           </div>
 
           {/* Motto Badge / Watermark Cover - Fixed at bottom of hero section */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[100] px-3 py-2 bg-[#F96846] rounded-full shadow-lg pointer-events-auto flex items-center justify-center whitespace-nowrap">
+          <div className="absolute bottom-7 left-1/2 -translate-x-1/2 z-[100] px-2 py-1.5 bg-[#0F0F0F] border border-[#F96846] rounded-xl shadow-lg pointer-events-auto flex items-center justify-center whitespace-nowrap transition-all duration-300 hover:shadow-[0_0_20px_rgba(249,104,70,0.6)] hover:scale-105 group cursor-default">
             <span className="text-white font-space-grotesk font-medium text-lg tracking-wide">
               Learn, Evolve, Transform
             </span>

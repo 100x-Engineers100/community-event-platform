@@ -50,11 +50,27 @@ export async function GET() {
       supabase.from('events').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
       supabase.from('registrations').select('*', { count: 'exact', head: true }),
       supabase.from('events')
-        .select('*, profiles:host_id(full_name, email)')
+        .select('*')
         .eq('status', 'submitted')
         .order('submitted_at', { ascending: false })
         .limit(5)
     ]);
+
+    // Fetch profiles for recent submissions
+    let recentWithProfiles = [];
+    if (recentSubmissionsResult.data && recentSubmissionsResult.data.length > 0) {
+      const hostIds = [...new Set(recentSubmissionsResult.data.map(e => e.host_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .in('id', hostIds);
+
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+      recentWithProfiles = recentSubmissionsResult.data.map(event => ({
+        ...event,
+        profiles: profileMap.get(event.host_id) || { full_name: 'Unknown', email: 'unknown@example.com' }
+      }));
+    }
 
     const stats = {
       pending: submittedResult.count || 0,
@@ -63,7 +79,7 @@ export async function GET() {
       expired: expiredResult.count || 0,
       completed: completedResult.count || 0,
       totalRegistrations: totalRegistrationsResult.count || 0,
-      recentSubmissions: recentSubmissionsResult.data || []
+      recentSubmissions: recentWithProfiles
     };
 
     return NextResponse.json({ stats });

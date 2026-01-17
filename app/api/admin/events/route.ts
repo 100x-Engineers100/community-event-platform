@@ -38,17 +38,10 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const limit = parseInt(searchParams.get('limit') || '100');
 
-    // Build query
+    // Build query - fetch events first
     let query = supabase
       .from('events')
-      .select(`
-        *,
-        profiles:host_id (
-          full_name,
-          email,
-          affiliation
-        )
-      `)
+      .select('*')
       .order('submitted_at', { ascending: false })
       .limit(limit);
 
@@ -67,7 +60,25 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ events: events || [] });
+    // Fetch profile data for each event
+    if (events && events.length > 0) {
+      const hostIds = [...new Set(events.map(e => e.host_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, affiliation')
+        .in('id', hostIds);
+
+      // Map profiles to events
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+      const eventsWithProfiles = events.map(event => ({
+        ...event,
+        profiles: profileMap.get(event.host_id) || null
+      }));
+
+      return NextResponse.json({ events: eventsWithProfiles });
+    }
+
+    return NextResponse.json({ events: [] });
 
   } catch (error) {
     console.error('[ADMIN] Unexpected error:', error);

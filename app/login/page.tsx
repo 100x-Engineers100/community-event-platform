@@ -45,7 +45,7 @@ function LoginForm() {
         )}
         <Button
           onClick={handleGoogleLogin}
-          className="w-full bg-[#F96846] hover:bg-[#ff7a59] text-black font-medium transition-all duration-200 hover:shadow-[0_0_20px_rgba(249,104,70,0.3)]"
+          className="w-full bg-[#F96846] hover:bg-[#ff7a59] text-white font-bold transition-all duration-200 hover:shadow-[0_0_15px_rgba(249,104,70,0.6)]"
           size="lg"
         >
           <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
