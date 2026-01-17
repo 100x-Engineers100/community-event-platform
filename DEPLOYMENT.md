@@ -43,7 +43,7 @@
    - anon/public key (`NEXT_PUBLIC_SUPABASE_ANON_KEY`)
    - service_role key (`SUPABASE_SERVICE_ROLE_KEY`)
 
----
+---   
 
 ## Step 2: Deploy to Vercel
 
