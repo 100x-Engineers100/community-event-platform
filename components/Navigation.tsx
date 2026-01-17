@@ -9,7 +9,7 @@ import { LogOut, Menu, X } from 'lucide-react'
 import { Profile } from '@/lib/types'
 
 interface NavigationProps {
-  user: Profile
+  user?: Profile
 }
 
 export function Navigation({ user }: NavigationProps) {
@@ -60,21 +60,31 @@ export function Navigation({ user }: NavigationProps) {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-4">
-              <div className="text-sm text-100x-text-secondary">
-                <span className="text-100x-text-primary font-medium">{user.full_name}</span>
-                <span className="mx-2">•</span>
-                <span>{user.affiliation}</span>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSignOut}
-                disabled={isLoggingOut}
-                className="border-100x-accent-primary text-100x-accent-primary hover:bg-100x-accent-primary hover:text-white transition-all duration-300"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                {isLoggingOut ? 'Signing out...' : 'Sign Out'}
-              </Button>
+              {user ? (
+                <>
+                  <div className="text-sm text-100x-text-secondary">
+                    <span className="text-100x-text-primary font-medium">{user.full_name}</span>
+                    <span className="mx-2">•</span>
+                    <span>{user.affiliation}</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSignOut}
+                    disabled={isLoggingOut}
+                    className="border-100x-accent-primary text-100x-accent-primary hover:bg-100x-accent-primary hover:text-white transition-all duration-300"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    {isLoggingOut ? 'Signing out...' : 'Sign Out'}
+                  </Button>
+                </>
+              ) : (
+                <Link href="/login">
+                  <Button className="bg-100x-accent-primary hover:bg-100x-accent-primary/90 text-white transition-all duration-300">
+                    Sign In
+                  </Button>
+                </Link>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -101,22 +111,32 @@ export function Navigation({ user }: NavigationProps) {
         }}
       >
         <div className="flex flex-col p-6 space-y-4 mt-16">
-          <div className="text-sm text-100x-text-secondary pb-4 border-b border-100x-border-default">
-            <div className="text-100x-text-primary font-medium">{user.full_name}</div>
-            <div className="text-xs mt-1">{user.email}</div>
-            <div className="text-xs mt-1">{user.affiliation}</div>
-          </div>
+          {user ? (
+            <>
+              <div className="text-sm text-100x-text-secondary pb-4 border-b border-100x-border-default">
+                <div className="text-100x-text-primary font-medium">{user.full_name}</div>
+                <div className="text-xs mt-1">{user.email}</div>
+                <div className="text-xs mt-1">{user.affiliation}</div>
+              </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSignOut}
-            disabled={isLoggingOut}
-            className="w-full border-100x-accent-primary text-100x-accent-primary hover:bg-100x-accent-primary hover:text-white transition-all"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            {isLoggingOut ? 'Signing out...' : 'Sign Out'}
-          </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSignOut}
+                disabled={isLoggingOut}
+                className="w-full border-100x-accent-primary text-100x-accent-primary hover:bg-100x-accent-primary hover:text-white transition-all"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                {isLoggingOut ? 'Signing out...' : 'Sign Out'}
+              </Button>
+            </>
+          ) : (
+            <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+              <Button className="w-full bg-100x-accent-primary hover:bg-100x-accent-primary/90 text-white">
+                Sign In
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
 
