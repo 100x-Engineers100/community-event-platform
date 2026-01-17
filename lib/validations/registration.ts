@@ -1,0 +1,40 @@
+import { z } from 'zod';
+
+/**
+ * Registration form validation schema
+ * Used for client-side and server-side validation
+ */
+export const registrationSchema = z.object({
+  attendee_name: z
+    .string()
+    .min(2, 'Name must be at least 2 characters')
+    .max(100, 'Name must be less than 100 characters')
+    .trim(),
+
+  attendee_email: z
+    .string()
+    .email('Please enter a valid email address')
+    .toLowerCase()
+    .trim(),
+
+  // Optional: Terms acceptance (not stored in DB, just for UX)
+  terms_accepted: z
+    .boolean()
+    .refine(val => val === true, {
+      message: 'You must accept the terms to register'
+    })
+    .optional()
+});
+
+export type RegistrationFormData = z.infer<typeof registrationSchema>;
+
+/**
+ * Server-side registration schema (without terms_accepted)
+ * This is what gets inserted into the database
+ */
+export const registrationDBSchema = registrationSchema.pick({
+  attendee_name: true,
+  attendee_email: true
+});
+
+export type RegistrationDBData = z.infer<typeof registrationDBSchema>;
