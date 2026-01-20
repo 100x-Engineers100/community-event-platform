@@ -97,7 +97,8 @@ export async function POST(
       .insert({
         event_id: eventId,
         attendee_name,
-        attendee_email
+        attendee_email,
+        whatsapp_number: validationResult.data.whatsapp_number
       })
       .select()
       .single();
@@ -130,6 +131,7 @@ export async function POST(
         id: registration.id,
         attendee_name: registration.attendee_name,
         attendee_email: registration.attendee_email,
+        whatsapp_number: registration.whatsapp_number,
         registered_at: registration.registered_at
       },
       event: {

@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
@@ -11,7 +10,19 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Navigation } from '@/components/Navigation';
 import { format } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
-import { Globe, Building, MapPin, Users, Calendar, Clock } from 'lucide-react';
+import {
+  MapPin,
+  Users,
+  Calendar,
+  ArrowLeft,
+  Check,
+  X,
+  User,
+  Hourglass,
+  AlertTriangle,
+} from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+
 
 interface Event {
   id: string;
@@ -44,14 +55,15 @@ export default function EventReviewPage() {
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Dialog states
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
 
   useEffect(() => {
     const fetchEvent = async () => {
+      if (!eventId) return;
       try {
+        setLoading(true);
         const response = await fetch(`/api/admin/events?status=submitted&limit=1000`);
 
         if (response.status === 401) {
@@ -67,7 +79,7 @@ export default function EventReviewPage() {
         const foundEvent = data.events.find((e: Event) => e.id === eventId);
 
         if (!foundEvent) {
-          setError('Event not found');
+          setError('Event not found or already reviewed.');
         } else {
           setEvent(foundEvent);
         }
@@ -93,7 +105,6 @@ export default function EventReviewPage() {
         throw new Error(data.error || 'Failed to approve event');
       }
 
-      // Success - redirect to pending page
       router.push('/admin/pending?approved=true');
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to approve event');
@@ -120,7 +131,6 @@ export default function EventReviewPage() {
         throw new Error(data.error || 'Failed to reject event');
       }
 
-      // Success - redirect to pending page
       router.push('/admin/pending?rejected=true');
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to reject event');
@@ -128,306 +138,185 @@ export default function EventReviewPage() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const istDate = toZonedTime(new Date(dateString), 'Asia/Kolkata');
-    return format(istDate, 'MMMM dd, yyyy');
+  const InfoCard = ({ icon: Icon, title, children }: {
+    icon: React.ComponentType<{ className?: string }>,
+    title: string,
+    children: React.ReactNode
+  }) => (
+    <Card className="bg-100x-bg-secondary border-100x-border-default">
+      <CardHeader className="flex flex-row items-center gap-3 space-y-0 pb-4">
+        <Icon className="w-5 h-5 text-100x-accent-primary" />
+        <CardTitle className="text-lg text-100x-text-primary">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="text-100x-text-secondary space-y-3 text-sm">
+        {children}
+      </CardContent>
+    </Card>
+  );
+
+  const InfoDetail = ({ label, value, isLink = false }: { label: string, value: string | null, isLink?: boolean }) => {
+    if (!value) return null;
+    return (
+      <div>
+        <p className="text-xs text-100x-text-muted uppercase tracking-wider">{label}</p>
+        {isLink ? (
+          <a
+            href={value}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-100x-accent-primary hover:underline break-all"
+          >
+            {value}
+          </a>
+        ) : (
+          <p className="text-100x-text-primary font-medium break-words">{value}</p>
+        )}
+      </div>
+    )
   };
 
-  const formatTime = (dateString: string) => {
-    const istDate = toZonedTime(new Date(dateString), 'Asia/Kolkata');
-    return format(istDate, 'h:mm a');
-  };
-
-  const getLocationIcon = (locationType: string) => {
-    const icons = {
-      online: <Globe className="w-5 h-5" />,
-      offline: <Building className="w-5 h-5" />,
-      hybrid: <MapPin className="w-5 h-5" />
-    };
-    return icons[locationType as keyof typeof icons] || <MapPin className="w-5 h-5" />;
-  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-4 border-orange-500 border-t-transparent rounded-full"></div>
-      </div>
-    );
-  }
-
-  if (error || !event) {
-    return (
-      <div className="min-h-screen bg-black">
+      <div className="min-h-screen bg-100x-bg-primary text-100x-text-primary p-4 sm:p-6 lg:p-8">
         <Navigation />
-        <main className="container mx-auto px-4 py-8">
-          <div className="text-center py-12">
-            <h1 className="text-2xl font-bold text-red-400 mb-4">Error</h1>
-            <p className="text-gray-400">{error || 'Event not found'}</p>
-            <Button
-              onClick={() => router.push('/admin/pending')}
-              className="mt-6 bg-orange-500 hover:bg-orange-600"
-            >
-              Back to Pending Events
-            </Button>
+        <main className="container mx-auto max-w-5xl mt-10">
+          <Skeleton className="h-8 w-48 mb-8 bg-100x-bg-tertiary" />
+          <Skeleton className="h-12 w-3/4 mb-2 bg-100x-bg-tertiary" />
+          <Skeleton className="h-6 w-1/2 mb-8 bg-100x-bg-tertiary" />
+          <div className="flex gap-4 mb-8">
+            <Skeleton className="h-16 flex-1 bg-green-500/10" />
+            <Skeleton className="h-16 flex-1 bg-red-500/10" />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              <Skeleton className="h-64 w-full bg-100x-bg-secondary" />
+              <Skeleton className="h-48 w-full bg-100x-bg-secondary" />
+            </div>
+            <div className="space-y-6">
+              <Skeleton className="h-48 w-full bg-100x-bg-secondary" />
+              <Skeleton className="h-48 w-full bg-100x-bg-secondary" />
+            </div>
           </div>
         </main>
       </div>
     );
   }
 
+  if (error || !event) {
+    return (
+      <div className="min-h-screen bg-100x-bg-primary text-100x-text-primary flex items-center justify-center">
+        <Navigation />
+        <main className="container mx-auto text-center">
+          <AlertTriangle className="w-16 h-16 text-red-400 mb-6 mx-auto" />
+          <h1 className="text-3xl font-bold text-red-400 mb-4">Could not load event</h1>
+          <p className="text-100x-text-secondary max-w-md mb-8 mx-auto">{error || 'The requested event could not be found or loaded.'}</p>
+          <Button onClick={() => router.push('/admin/pending')} className="bg-100x-accent-primary hover:bg-100x-accent-primary/90 text-black font-bold group">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Pending Queue
+          </Button>
+        </main>
+      </div>
+    );
+  }
+
+  const { title, description, event_date, location_type, city, meeting_link, venue_address, max_capacity, profiles, submitted_at, expires_at } = event;
+
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-100x-bg-primary text-100x-text-primary">
       <Navigation />
-
       <main className="container mx-auto px-4 py-8 max-w-5xl">
-        {/* Header */}
+        <Button onClick={() => router.push('/admin/pending')} variant="outline" className="mb-6 border-100x-border-default hover:bg-100x-bg-secondary group">
+          <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+          Back to Queue
+        </Button>
+
         <div className="mb-8">
-          <Button
-            onClick={() => router.push('/admin/pending')}
-            variant="outline"
-            className="mb-4 border-gray-600"
-          >
-            ← Back to Pending
-          </Button>
+          <h1 className="text-4xl md:text-5xl font-bold text-100x-text-primary">{title}</h1>
+          <p className="text-100x-text-secondary mt-3 max-w-3xl">Review the details below and take action.</p>
+        </div>
 
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="h-10 w-1 bg-gradient-to-b from-orange-500 to-orange-500/0"></div>
-                <h1 className="text-4xl font-bold text-white">{event.title}</h1>
+        <div className="sticky top-0 z-10 bg-100x-bg-primary/80 backdrop-blur-lg py-4 -my-4 mb-8 flex gap-4">
+          <Button onClick={() => setApproveDialogOpen(true)} className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-6 text-lg group" disabled={actionLoading}>
+            <Check className="w-6 h-6 mr-3 transition-transform group-hover:scale-125" />
+            Approve
+          </Button>
+          <Button onClick={() => setRejectDialogOpen(true)} variant="destructive" className="flex-1 py-6 text-lg font-bold group" disabled={actionLoading}>
+            <X className="w-6 h-6 mr-3 transition-transform group-hover:rotate-12" />
+            Reject
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <InfoCard icon={MapPin} title="Event Details">
+              <p className="whitespace-pre-wrap">{description}</p>
+            </InfoCard>
+
+            <InfoCard icon={Calendar} title="Date & Location">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <InfoDetail label="Date" value={format(toZonedTime(new Date(event_date), 'Asia/Kolkata'), 'MMMM dd, yyyy')} />
+                <InfoDetail label="Time" value={format(toZonedTime(new Date(event_date), 'Asia/Kolkata'), 'h:mm a')} />
               </div>
-              <p className="text-gray-400 ml-4">Review and approve or reject this event</p>
-            </div>
-            <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 px-4 py-2">
-              Pending Review
-            </Badge>
+              <Separator className="bg-100x-border-default" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <InfoDetail label="Type" value={location_type} />
+                <InfoDetail label="City" value={city} />
+              </div>
+              <InfoDetail label="Venue" value={venue_address} />
+              <InfoDetail label="Meeting Link" value={meeting_link} isLink={true} />
+            </InfoCard>
           </div>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-4 mb-8">
-          <Button
-            onClick={() => setApproveDialogOpen(true)}
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-6 text-lg"
-            disabled={actionLoading}
-          >
-            ✓ Approve Event
-          </Button>
-          <Button
-            onClick={() => setRejectDialogOpen(true)}
-            variant="destructive"
-            className="flex-1 py-6 text-lg font-semibold"
-            disabled={actionLoading}
-          >
-            ✗ Reject Event
-          </Button>
-        </div>
-
-        <Separator className="my-8 bg-[#2A2A2A]" />
-
-        {/* Event Details */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* Main Info */}
-          <Card className="lg:col-span-2 bg-[#1A1A1A] border-[#2A2A2A]">
-            <CardHeader>
-              <CardTitle className="text-white">Event Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Description</h3>
-                <p className="text-white leading-relaxed">{event.description}</p>
-              </div>
-
-              <Separator className="bg-[#2A2A2A]" />
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-3 p-3 bg-[#141414] rounded-lg border border-[#2A2A2A]">
-                  <Calendar className="w-5 h-5 text-orange-400" />
-                  <div>
-                    <p className="text-xs text-gray-400">Date</p>
-                    <p className="text-white font-medium">{formatDate(event.event_date)}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-[#141414] rounded-lg border border-[#2A2A2A]">
-                  <Clock className="w-5 h-5 text-orange-400" />
-                  <div>
-                    <p className="text-xs text-gray-400">Time</p>
-                    <p className="text-white font-medium">{formatTime(event.event_date)}</p>
-                  </div>
-                </div>
-              </div>
-
-              <Separator className="bg-[#2A2A2A]" />
-
-              <div>
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Location Details</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-3 bg-[#141414] rounded-lg border border-[#2A2A2A]">
-                    {getLocationIcon(event.location_type)}
-                    <div>
-                      <p className="text-xs text-gray-400">Type</p>
-                      <p className="text-white font-medium capitalize">{event.location_type}</p>
-                    </div>
-                  </div>
-
-                  {event.city && (
-                    <div className="p-3 bg-[#141414] rounded-lg border border-[#2A2A2A]">
-                      <p className="text-xs text-gray-400 mb-1">City</p>
-                      <p className="text-white">{event.city}</p>
-                    </div>
-                  )}
-
-                  {event.meeting_link && (
-                    <div className="p-3 bg-[#141414] rounded-lg border border-[#2A2A2A]">
-                      <p className="text-xs text-gray-400 mb-1">Meeting Link</p>
-                      <a
-                        href={event.meeting_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-orange-400 hover:text-orange-300 underline break-all"
-                      >
-                        {event.meeting_link}
-                      </a>
-                    </div>
-                  )}
-
-                  {event.venue_address && (
-                    <div className="p-3 bg-[#141414] rounded-lg border border-[#2A2A2A]">
-                      <p className="text-xs text-gray-400 mb-1">Venue Address</p>
-                      <p className="text-white whitespace-pre-wrap">{event.venue_address}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <Separator className="bg-[#2A2A2A]" />
-
-              <div className="flex items-center gap-3 p-3 bg-[#141414] rounded-lg border border-[#2A2A2A]">
-                <Users className="w-5 h-5 text-orange-400" />
-                <div>
-                  <p className="text-xs text-gray-400">Capacity</p>
-                  <p className="text-white font-medium">{event.max_capacity} attendees</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Sidebar */}
           <div className="space-y-6">
-            {/* Host Info */}
-            <Card className="bg-[#1A1A1A] border-[#2A2A2A]">
-              <CardHeader>
-                <CardTitle className="text-white text-lg">Host Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">Name</p>
-                  <p className="text-white font-medium">{event.profiles.full_name}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">Email</p>
-                  <p className="text-white text-sm">{event.profiles.email}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">Affiliation</p>
-                  <Badge variant="outline" className="border-orange-500/30 text-orange-400">
-                    {event.profiles.affiliation}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
+            <InfoCard icon={User} title="Host Information">
+              <InfoDetail label="Name" value={profiles.full_name} />
+              <InfoDetail label="Email" value={profiles.email} />
+              <InfoDetail label="Affiliation" value={profiles.affiliation} />
+            </InfoCard>
 
-            {/* Submission Info */}
-            <Card className="bg-[#1A1A1A] border-[#2A2A2A]">
-              <CardHeader>
-                <CardTitle className="text-white text-lg">Submission Details</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">Submitted</p>
-                  <p className="text-white text-sm">{formatDate(event.submitted_at)}</p>
-                  <p className="text-gray-400 text-xs">{formatTime(event.submitted_at)}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">Expires</p>
-                  <p className="text-white text-sm">{formatDate(event.expires_at)}</p>
-                  <p className="text-gray-400 text-xs">{formatTime(event.expires_at)}</p>
-                </div>
-              </CardContent>
-            </Card>
+            <InfoCard icon={Hourglass} title="Submission Timeline">
+              <InfoDetail label="Submitted On" value={format(new Date(submitted_at), 'MMM dd, yyyy, h:mm a')} />
+              <InfoDetail label="Expires On" value={format(new Date(expires_at), 'MMM dd, yyyy, h:mm a')} />
+            </InfoCard>
+
+            <InfoCard icon={Users} title="Capacity">
+              <InfoDetail label="Maximum Attendees" value={String(max_capacity)} />
+            </InfoCard>
           </div>
         </div>
 
-        {/* Approve Dialog */}
+        {/* Dialogs */}
         <Dialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
-          <DialogContent className="bg-[#1A1A1A] border-[#2A2A2A] text-white">
+          <DialogContent className="bg-100x-bg-secondary border-100x-border-default text-100x-text-primary">
             <DialogHeader>
-              <DialogTitle>Approve Event?</DialogTitle>
-              <DialogDescription className="text-gray-400">
-                This event will be published and visible to all users. The host will be able to see registrations.
-              </DialogDescription>
+              <DialogTitle className="text-2xl text-green-400">Approve Event?</DialogTitle>
+              <DialogDescription className="text-100x-text-secondary">The event will go live and be visible to everyone. The host will be notified.</DialogDescription>
             </DialogHeader>
-            <div className="py-4">
-              <p className="text-white font-medium">{event.title}</p>
-              <p className="text-sm text-gray-400 mt-1">by {event.profiles.full_name}</p>
-            </div>
             <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setApproveDialogOpen(false)}
-                disabled={actionLoading}
-                className="border-gray-600"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleApprove}
-                disabled={actionLoading}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                {actionLoading ? 'Approving...' : 'Approve Event'}
-              </Button>
+              <Button variant="outline" onClick={() => setApproveDialogOpen(false)} disabled={actionLoading} className="border-100x-border-default hover:bg-100x-bg-tertiary">Cancel</Button>
+              <Button onClick={handleApprove} disabled={actionLoading} className="bg-green-600 hover:bg-green-700 text-white">{actionLoading ? 'Approving...' : 'Confirm & Approve'}</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
 
-        {/* Reject Dialog */}
         <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
-          <DialogContent className="bg-[#1A1A1A] border-[#2A2A2A] text-white">
+          <DialogContent className="bg-100x-bg-secondary border-100x-border-default text-100x-text-primary">
             <DialogHeader>
-              <DialogTitle>Reject Event?</DialogTitle>
-              <DialogDescription className="text-gray-400">
-                Please provide a reason for rejection. This will be visible to the host.
-              </DialogDescription>
+              <DialogTitle className="text-2xl text-red-400">Reject Event?</DialogTitle>
+              <DialogDescription className="text-100x-text-secondary">Provide a clear reason for rejection. The host will be notified.</DialogDescription>
             </DialogHeader>
-            <div className="py-4 space-y-4">
-              <div>
-                <p className="text-white font-medium">{event.title}</p>
-                <p className="text-sm text-gray-400 mt-1">by {event.profiles.full_name}</p>
-              </div>
+            <div className="py-4">
               <Textarea
-                placeholder="Reason for rejection (minimum 10 characters)..."
+                placeholder="Enter rejection reason (min 10 characters)..."
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
-                className="bg-[#141414] border-[#2A2A2A] text-white min-h-[100px]"
+                className="bg-100x-bg-primary border-100x-border-default min-h-[120px] focus:ring-100x-accent-primary"
               />
             </div>
             <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setRejectDialogOpen(false)}
-                disabled={actionLoading}
-                className="border-gray-600"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleReject}
-                disabled={actionLoading || rejectionReason.trim().length < 10}
-                variant="destructive"
-              >
-                {actionLoading ? 'Rejecting...' : 'Reject Event'}
-              </Button>
+              <Button variant="outline" onClick={() => setRejectDialogOpen(false)} disabled={actionLoading} className="border-100x-border-default hover:bg-100x-bg-tertiary">Cancel</Button>
+              <Button onClick={handleReject} disabled={actionLoading || rejectionReason.trim().length < 10} variant="destructive">{actionLoading ? 'Rejecting...' : 'Confirm & Reject'}</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

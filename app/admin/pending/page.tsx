@@ -9,6 +9,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Navigation } from '@/components/Navigation';
 import { format } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
+import { ArrowLeft, Hourglass, CheckCircle, AlertTriangle, Inbox, Flame, Calendar, MapPin, Users, Building, Globe } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface Event {
   id: string;
@@ -33,38 +35,33 @@ export default function PendingEventsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchEvents = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/admin/events?status=submitted');
-
-      if (response.status === 401) {
-        router.push('/login');
-        return;
-      }
-
-      if (response.status === 403) {
-        setError('Access denied - Admin privileges required');
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch events');
-      }
-
-      const data = await response.json();
-      setEvents(data.events || []);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/admin/events?status=submitted');
+        if (response.status === 401) {
+          router.push('/login');
+          return;
+        }
+        if (response.status === 403) {
+          setError('Access denied - Admin privileges required');
+          return;
+        }
+        if (!response.ok) {
+          throw new Error('Failed to fetch events');
+        }
+        const data = await response.json();
+        setEvents(data.events || []);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchEvents();
-  }, []);
+  }, [router]);
 
   const formatDate = (dateString: string) => {
     const istDate = toZonedTime(new Date(dateString), 'Asia/Kolkata');
@@ -75,167 +72,152 @@ export default function PendingEventsPage() {
     const now = new Date();
     const expiry = new Date(expiresAt);
     const diffMs = expiry.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-    return diffDays;
+    return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
   };
 
-  const getLocationBadge = (locationType: string) => {
-    const colors = {
-      online: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-      offline: 'bg-green-500/20 text-green-400 border-green-500/30',
-      hybrid: 'bg-purple-500/20 text-purple-400 border-purple-500/30'
+  const LocationInfo = ({ type, city }: { type: string; city: string | null }) => {
+    const iconMap: { [key: string]: React.ReactNode } = {
+      online: <Globe className="w-4 h-4 text-blue-400" />,
+      offline: <Building className="w-4 h-4 text-green-400" />,
+      hybrid: <MapPin className="w-4 h-4 text-purple-400" />,
     };
-
     return (
-      <Badge variant="outline" className={colors[locationType as keyof typeof colors] || 'bg-gray-500/20 text-gray-400'}>
-        {locationType}
-      </Badge>
-    );
-  };
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-black">
-        <Navigation />
-        <main className="container mx-auto px-4 py-8">
-          <div className="text-center py-12">
-            <h1 className="text-2xl font-bold text-red-400 mb-4">Error</h1>
-            <p className="text-gray-400">{error}</p>
-          </div>
-        </main>
+      <div className="flex items-center gap-2">
+        {iconMap[type]}
+        <span className="capitalize">{city || type}</span>
       </div>
     );
-  }
+  };
+  
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center py-20">
+          <Hourglass className="h-12 w-12 text-100x-accent-primary animate-spin" />
+        </div>
+      );
+    }
+    
+    if (error) {
+        return (
+          <div className="flex flex-col items-center justify-center text-center py-20">
+            <AlertTriangle className="w-16 h-16 text-red-400 mb-6" />
+            <h2 className="text-3xl font-bold text-red-400 mb-4">An Error Occurred</h2>
+            <p className="text-100x-text-secondary max-w-md">{error}</p>
+          </div>
+        );
+      }
+
+    if (events.length === 0) {
+      return (
+        <Card className="bg-100x-bg-secondary border-100x-border-default">
+          <CardContent className="text-center py-20 flex flex-col items-center">
+            <CheckCircle className="w-16 h-16 text-green-400 mb-6" />
+            <h2 className="text-3xl font-bold text-100x-text-primary mb-2">Inbox Zero!</h2>
+            <p className="text-100x-text-secondary">No pending events to review. Great job!</p>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    return (
+      <Card className="bg-100x-bg-secondary border-100x-border-default">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-100x-border-default">
+                  <TableHead className="text-100x-text-secondary font-semibold">Event</TableHead>
+                  <TableHead className="text-100x-text-secondary font-semibold">Host</TableHead>
+                  <TableHead className="text-100x-text-secondary font-semibold">Details</TableHead>
+                  <TableHead className="text-100x-text-secondary font-semibold">Submitted</TableHead>
+                  <TableHead className="text-100x-text-secondary font-semibold text-right">Expires In</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {events.map((event) => {
+                  const daysLeft = getDaysUntilExpiry(event.expires_at);
+                  const isUrgent = daysLeft <= 2;
+                  return (
+                    <TableRow
+                      key={event.id}
+                      className="border-100x-border-default hover:bg-100x-bg-tertiary/50 transition-colors cursor-pointer"
+                      onClick={() => router.push(`/admin/review/${event.id}`)}
+                    >
+                      <TableCell className="font-medium">
+                        <div className="max-w-xs flex items-center gap-3">
+                           <div className={cn("w-2 h-2 rounded-full", isUrgent ? "bg-red-500 animate-pulse" : "bg-100x-accent-primary")}></div>
+                           <div>
+                            <p className="text-100x-text-primary truncate font-bold">{event.title}</p>
+                            <p className="text-sm text-100x-text-muted truncate">{event.description.substring(0, 40)}...</p>
+                           </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <p className="text-100x-text-primary text-sm font-semibold">{event.profiles.full_name}</p>
+                        <p className="text-xs text-100x-text-muted">{event.profiles.affiliation}</p>
+                      </TableCell>
+                      <TableCell className="text-100x-text-secondary text-sm">
+                        <div className="flex flex-col gap-2">
+                           <LocationInfo type={event.location_type} city={event.city} />
+                           <div className="flex items-center gap-2"><Users className="w-4 h-4" /><span>{event.max_capacity}</span></div>
+                           <div className="flex items-center gap-2"><Calendar className="w-4 h-4" /><span>{format(toZonedTime(new Date(event.event_date), 'Asia/Kolkata'), 'MMM dd, yyyy')}</span></div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-100x-text-muted text-sm">
+                        {format(new Date(event.submitted_at), 'dd MMM yyyy')}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "font-bold",
+                            isUrgent 
+                              ? 'border-red-500/30 text-red-400' 
+                              : 'border-100x-accent-primary/30 text-100x-accent-primary'
+                          )}
+                        >
+                          <Flame className={cn("w-3 h-3 mr-1.5", isUrgent && "text-red-400")} />
+                          {daysLeft} day{daysLeft !== 1 ? 's' : ''}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-100x-bg-primary text-100x-text-primary">
       <Navigation />
-
       <main className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="h-10 w-1 bg-gradient-to-b from-orange-500 to-orange-500/0"></div>
-                <h1 className="text-4xl font-bold text-white">Pending Reviews</h1>
-                <Badge className="bg-orange-500 text-white px-3 py-1">
-                  {events.length}
-                </Badge>
-              </div>
-              <p className="text-gray-400 ml-4">Events awaiting approval</p>
-            </div>
             <Button
               onClick={() => router.push('/admin')}
               variant="outline"
-              className="border-gray-600"
+              className="mb-6 border-100x-border-default hover:bg-100x-bg-secondary"
             >
+              <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
-          </div>
+            <div className="flex items-center justify-between">
+                <div className='text-center w-full'>
+                    <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-100x-accent-primary/80 to-100x-accent-primary">
+                        Pending Review Queue
+                    </h1>
+                    <p className="text-100x-text-secondary mt-3 max-w-2xl mx-auto">
+                        {loading ? 'Fetching events...' : `You have ${events.length} events awaiting your approval.`}
+                    </p>
+                </div>
+            </div>
         </div>
 
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin h-12 w-12 border-4 border-orange-500 border-t-transparent rounded-full"></div>
-          </div>
-        ) : events.length === 0 ? (
-          <Card className="bg-[#1A1A1A] border-[#2A2A2A]">
-            <CardContent className="text-center py-12">
-              <div className="text-6xl mb-4">✓</div>
-              <h2 className="text-2xl font-bold text-white mb-2">All Caught Up!</h2>
-              <p className="text-gray-400">No pending events to review</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card className="bg-[#1A1A1A] border-[#2A2A2A]">
-            <CardHeader>
-              <CardTitle className="text-white">Review Queue</CardTitle>
-              <CardDescription className="text-gray-400">
-                Click on any event to review details and approve/reject
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-[#2A2A2A] hover:bg-[#141414]">
-                      <TableHead className="text-gray-300 font-semibold">Event</TableHead>
-                      <TableHead className="text-gray-300 font-semibold">Host</TableHead>
-                      <TableHead className="text-gray-300 font-semibold">Date</TableHead>
-                      <TableHead className="text-gray-300 font-semibold">Type</TableHead>
-                      <TableHead className="text-gray-300 font-semibold">Capacity</TableHead>
-                      <TableHead className="text-gray-300 font-semibold">Submitted</TableHead>
-                      <TableHead className="text-gray-300 font-semibold">Expires</TableHead>
-                      <TableHead className="text-gray-300 font-semibold">Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {events.map((event) => {
-                      const daysLeft = getDaysUntilExpiry(event.expires_at);
-                      const isUrgent = daysLeft <= 2;
-
-                      return (
-                        <TableRow
-                          key={event.id}
-                          className="border-[#2A2A2A] hover:bg-[#141414] transition-colors cursor-pointer"
-                          onClick={() => router.push(`/admin/review/${event.id}`)}
-                        >
-                          <TableCell className="font-medium">
-                            <div className="max-w-xs">
-                              <p className="text-white truncate">{event.title}</p>
-                              <p className="text-sm text-gray-400 truncate">{event.description.substring(0, 50)}...</p>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div>
-                              <p className="text-white text-sm">{event.profiles.full_name}</p>
-                              <Badge variant="outline" className="mt-1 text-xs border-gray-600 text-gray-400">
-                                {event.profiles.affiliation}
-                              </Badge>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-gray-300">
-                            {formatDate(event.event_date)}
-                          </TableCell>
-                          <TableCell>
-                            {getLocationBadge(event.location_type)}
-                          </TableCell>
-                          <TableCell className="text-gray-300">
-                            {event.max_capacity}
-                          </TableCell>
-                          <TableCell className="text-gray-400 text-sm">
-                            {formatDate(event.submitted_at)}
-                          </TableCell>
-                          <TableCell>
-                            <Badge
-                              variant="outline"
-                              className={isUrgent ? 'border-red-500/30 text-red-400 animate-pulse' : 'border-orange-500/30 text-orange-400'}
-                            >
-                              {daysLeft} day{daysLeft !== 1 ? 's' : ''}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              size="sm"
-                              className="bg-orange-500 hover:bg-orange-600 text-white"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                router.push(`/admin/review/${event.id}`);
-                              }}
-                            >
-                              Review
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {renderContent()}
       </main>
     </div>
   );

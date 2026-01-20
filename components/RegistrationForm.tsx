@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registrationSchema, RegistrationFormData } from '@/lib/validations/registration';
 import { Button } from '@/components/ui/button';
+import { ShimmerButton } from '@/components/ui/shimmer-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -121,6 +122,25 @@ export default function RegistrationForm({ eventId, eventTitle }: RegistrationFo
           )}
         </div>
 
+        {/* WhatsApp Field */}
+        <div className="space-y-2">
+          <Label htmlFor="whatsapp_number" className="text-100x-text-primary">
+            WhatsApp Number <span className="text-100x-accent-primary">*</span>
+          </Label>
+          <Input
+            id="whatsapp_number"
+            type="text"
+            placeholder="+91 9876543210"
+            className={`bg-white border-100x-border-default text-black placeholder:text-gray-400 focus:border-100x-accent-primary focus:ring-1 focus:ring-100x-accent-primary h-12 ${errors.whatsapp_number ? 'border-red-500' : ''
+              }`}
+            {...register('whatsapp_number')}
+            disabled={isSubmitting}
+          />
+          {errors.whatsapp_number && (
+            <p className="text-sm text-red-500">{errors.whatsapp_number.message}</p>
+          )}
+        </div>
+
         {/* Terms Checkbox */}
         <div className="flex items-start gap-2">
           <input
@@ -147,20 +167,22 @@ export default function RegistrationForm({ eventId, eventTitle }: RegistrationFo
         )}
 
         {/* Submit Button */}
-        <Button
+        <ShimmerButton
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-transparent border-2 border-100x-accent-primary text-100x-accent-primary hover:bg-100x-accent-primary hover:text-white font-bold transition-all duration-300 hover:shadow-[0_0_25px_rgba(249,104,70,0.6)] py-6 uppercase tracking-wider"
+          shimmerColor="#ffffff"
+          background="#FF6B35"
+          className="w-full text-black font-bold py-6 uppercase tracking-wider rounded-lg disabled:opacity-50 transition-all hover:scale-[1.01] active:scale-[0.99]"
         >
           {isSubmitting ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <Loader2 className="w-2 h-2 mr-1 animate-spin" />
               Registering...
             </>
           ) : (
             'Register Now'
           )}
-        </Button>
+        </ShimmerButton>
 
         <p className="text-xs text-100x-text-muted text-center">
           Registration is free. You'll receive event details after registering.

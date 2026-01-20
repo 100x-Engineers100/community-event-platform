@@ -26,68 +26,70 @@ export const eventFormSchema = z.object({
 
   max_capacity: z.number()
     .min(5, 'Minimum capacity is 5')
-    .max(500, 'Maximum capacity is 500')
-})
-.superRefine((data, ctx) => {
-  // Online: requires meeting_link
-  if (data.location_type === 'online') {
-    if (!data.meeting_link) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Meeting link is required for online events',
-        path: ['meeting_link']
-      })
-    } else if (!isValidUrl(data.meeting_link)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Please enter a valid URL',
-        path: ['meeting_link']
-      })
-    }
-  }
+    .max(500, 'Maximum capacity is 500'),
 
-  // Offline: requires city and venue_address
-  if (data.location_type === 'offline') {
-    if (!data.city) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'City is required for offline events',
-        path: ['city']
-      })
-    }
-    if (!data.venue_address) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Venue address is required for offline events',
-        path: ['venue_address']
-      })
-    }
-  }
-
-  // Hybrid: requires city and meeting_link
-  if (data.location_type === 'hybrid') {
-    if (!data.city) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'City is required for hybrid events',
-        path: ['city']
-      })
-    }
-    if (!data.meeting_link) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Meeting link is required for hybrid events',
-        path: ['meeting_link']
-      })
-    } else if (!isValidUrl(data.meeting_link)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Please enter a valid URL',
-        path: ['meeting_link']
-      })
-    }
-  }
+  event_image_url: z.string().optional()
 })
+  .superRefine((data, ctx) => {
+    // Online: requires meeting_link
+    if (data.location_type === 'online') {
+      if (!data.meeting_link) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Meeting link is required for online events',
+          path: ['meeting_link']
+        })
+      } else if (!isValidUrl(data.meeting_link)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Please enter a valid URL',
+          path: ['meeting_link']
+        })
+      }
+    }
+
+    // Offline: requires city and venue_address
+    if (data.location_type === 'offline') {
+      if (!data.city) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'City is required for offline events',
+          path: ['city']
+        })
+      }
+      if (!data.venue_address) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Venue address is required for offline events',
+          path: ['venue_address']
+        })
+      }
+    }
+
+    // Hybrid: requires city and meeting_link
+    if (data.location_type === 'hybrid') {
+      if (!data.city) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'City is required for hybrid events',
+          path: ['city']
+        })
+      }
+      if (!data.meeting_link) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Meeting link is required for hybrid events',
+          path: ['meeting_link']
+        })
+      } else if (!isValidUrl(data.meeting_link)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Please enter a valid URL',
+          path: ['meeting_link']
+        })
+      }
+    }
+  })
 
 function isValidUrl(url: string): boolean {
   try {

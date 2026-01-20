@@ -27,7 +27,7 @@ export async function GET(request: Request) {
         status,
         created_at
       `)
-      .eq('status', type === 'past' ? 'completed' : 'published')
+      .in('status', ['published', 'completed'])
 
     // Filter by date
     if (type === 'upcoming') {

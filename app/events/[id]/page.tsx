@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Event } from '@/lib/types'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { format } from 'date-fns'
 import { toZonedTime } from 'date-fns-tz'
 import {
@@ -16,10 +15,15 @@ import {
   ArrowLeft,
   Clock,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Share2,
+  Sparkles
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import RegistrationForm from '@/components/RegistrationForm'
+import { ShimmerButton } from '@/components/ui/shimmer-button'
+import { motion, AnimatePresence } from 'framer-motion'
+import { SafeImage } from '@/components/event/SafeImage'
 
 export default function EventDetailPage() {
   const params = useParams()
@@ -61,10 +65,10 @@ export default function EventDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-100x-bg-primary flex items-center justify-center">
-        <div className="flex items-center gap-3">
-          <Loader2 className="w-8 h-8 text-100x-accent-primary animate-spin" />
-          <span className="text-100x-text-secondary">Loading event...</span>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 text-100x-accent-primary animate-spin" />
+          <span className="text-zinc-500 font-medium">Loading event details...</span>
         </div>
       </div>
     )
@@ -72,239 +76,276 @@ export default function EventDetailPage() {
 
   if (error || !event) {
     return (
-      <div className="min-h-screen bg-100x-bg-primary flex items-center justify-center p-4">
-        <Card className="max-w-md w-full border-100x-border-default bg-100x-bg-tertiary">
-          <CardContent className="pt-6 text-center space-y-4">
-            <AlertCircle className="w-12 h-12 text-red-400 mx-auto" />
-            <h2 className="text-xl font-semibold text-100x-text-primary">
-              {error || 'Event not found'}
-            </h2>
-            <p className="text-100x-text-secondary">
-              The event you're looking for doesn't exist or is no longer available.
-            </p>
-            <Button
-              onClick={() => router.push('/')}
-              className="bg-100x-accent-primary hover:bg-100x-accent-primary/90 text-white"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Events
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-zinc-900 border border-zinc-800 rounded-3xl p-8 text-center space-y-6 shadow-2xl">
+          <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto">
+            <AlertCircle className="w-8 h-8 text-red-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-white">
+            {error || 'Event not found'}
+          </h2>
+          <p className="text-zinc-400">
+            The event you're looking for doesn't exist or is no longer available for registration.
+          </p>
+          <Button
+            onClick={() => router.push('/')}
+            className="w-full h-12 bg-100x-accent-primary hover:bg-100x-accent-primary/90 text-black font-bold rounded-xl"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Home
+          </Button>
+        </div>
       </div>
     )
   }
 
   // Format date/time
   const istDate = toZonedTime(new Date(event.event_date), 'Asia/Kolkata')
-  const formattedDate = format(istDate, 'EEEE, MMMM d, yyyy')
+  const formattedDate = format(istDate, 'EEEE, MMMM d')
+  const formattedYear = format(istDate, 'yyyy')
   const formattedTime = format(istDate, 'h:mm a')
 
   const locationIcon = {
-    online: <Globe className="w-5 h-5 text-100x-accent-primary" />,
-    offline: <Building2 className="w-5 h-5 text-100x-accent-primary" />,
-    hybrid: <MapPin className="w-5 h-5 text-100x-accent-primary" />
+    online: <Globe className="w-5 h-5" />,
+    offline: <Building2 className="w-5 h-5" />,
+    hybrid: <MapPin className="w-5 h-5" />
   }
 
   const isFull = event.current_registrations >= event.max_capacity
-  const isPastEvent = event.status === 'completed'
-  const capacityPercentage = Math.min(
-    (event.current_registrations / event.max_capacity) * 100,
-    100
-  )
+  const isDatePast = new Date(event.event_date) < new Date()
+  const isPastEvent = event.status === 'completed' || isDatePast
 
   return (
-    <div className="min-h-screen bg-100x-bg-primary">
-      {/* Fixed Glassmorphism Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 pt-4">
-        <div
-          className="max-w-5xl mx-auto rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
-          style={{
-            background: 'rgba(10, 10, 10, 0.6)',
-            backdropFilter: 'blur(12px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(12px) saturate(180%)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-          }}
-        >
-          <div className="px-6 py-3 flex items-center justify-between">
+    <div className="min-h-screen bg-black text-white selection:bg-100x-accent-primary/30">
+      {/* Navbar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-4 pointer-events-none">
+        <div className="max-w-[1200px] mx-auto flex items-center justify-between pointer-events-auto">
+          <Button
+            variant="ghost"
+            onClick={() => router.push('/')}
+            className="h-10 px-4 backdrop-blur-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-full transition-all group"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+            Back
+          </Button>
+
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
-              onClick={() => router.push('/')}
-              className="text-100x-text-secondary hover:text-100x-accent-primary transition-all duration-300 p-2 hover:bg-100x-accent-primary/5 hover:shadow-[0_0_15px_rgba(249,104,70,0.3)]"
+              className="w-10 h-10 p-0 backdrop-blur-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-full"
             >
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              <span className="font-semibold">Back to Events</span>
+              <Share2 className="w-4 h-4" />
             </Button>
-
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-100x-accent-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">100x</span>
-              </div>
-            </div>
           </div>
         </div>
       </nav>
 
-      {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-28">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Column - Event Details */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Title & Status */}
-            <div>
-              {isPastEvent && (
-                <span className="inline-block px-3 py-1 mb-4 text-xs font-semibold rounded-full bg-blue-900/30 text-blue-300 border border-blue-900/50">
-                  Past Event
-                </span>
-              )}
-              {isFull && !isPastEvent && (
-                <span className="inline-block px-3 py-1 mb-4 text-xs font-semibold rounded-full bg-red-500/20 text-red-300 border border-red-900/50">
-                  Event Full
-                </span>
-              )}
-              <h1 className="text-3xl sm:text-4xl font-bold text-100x-text-primary mb-4">
-                {event.title}
-              </h1>
-            </div>
+      {/* Hero Section */}
+      <main className="max-w-[1200px] mx-auto px-4 pt-24 pb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
 
-            {/* Description */}
-            <Card className="border-100x-border-default bg-100x-bg-tertiary">
-              <CardHeader>
-                <h2 className="text-lg font-semibold text-100x-text-primary">
-                  About This Event
-                </h2>
-              </CardHeader>
-              <CardContent>
-                <p className="text-100x-text-secondary leading-relaxed whitespace-pre-wrap">
-                  {event.description}
-                </p>
-              </CardContent>
-            </Card>
+          {/* Left Column: Image & Registration Form */}
+          <div className="lg:col-span-5 space-y-10">
+            {/* Event Image */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="relative aspect-square w-full overflow-hidden rounded-[40px] shadow-2xl shadow-100x-accent-primary/10 border border-white/5"
+            >
+              <SafeImage
+                src={event.event_image_url}
+                alt={event.title}
+                fill
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
 
-            {/* Venue Details (for offline/hybrid) */}
-            {event.venue_address && (
-              <Card className="border-100x-border-default bg-100x-bg-tertiary">
-                <CardHeader>
-                  <h2 className="text-lg font-semibold text-100x-text-primary">
-                    Venue
-                  </h2>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-100x-text-secondary whitespace-pre-wrap">
-                    {event.venue_address}
+
+            </motion.div>
+
+            {/* About / Description (MOVED FROM RIGHT) */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="space-y-6"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
+                <div className="w-1.5 h-1.5 bg-100x-accent-primary rounded-full animate-pulse" />
+                <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">About Event</span>
+              </div>
+
+              <div className="space-y-8">
+                <div className="prose prose-invert max-w-none">
+                  <p className="text-xl text-zinc-300 leading-relaxed whitespace-pre-wrap font-medium">
+                    {event.description}
                   </p>
-                </CardContent>
-              </Card>
-            )}
+                </div>
+
+                {/* Hosted By (Staged) */}
+                <div className="pt-8 border-t border-zinc-900 flex items-center gap-4">
+                  <div className="w-12 h-12 bg-100x-accent-primary rounded-2xl flex items-center justify-center">
+                    <span className="text-black font-black text-sm">100x</span>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Organized by</p>
+                    <p className="font-bold text-white">100xEngineers</p>
+                  </div>
+                </div>
+
+                <p className="text-[10px] text-zinc-600 font-medium italic mt-8 border-l border-zinc-900 pl-4">
+                  * No production environments were harmed during the planning of this event.
+                </p>
+              </div>
+            </motion.div>
           </div>
 
-          {/* Right Column - Event Info & Registration */}
-          <div className="space-y-6">
-            {/* Event Info Card */}
-            <Card className="border-100x-border-default bg-100x-bg-tertiary">
-              <CardHeader>
-                <h2 className="text-lg font-semibold text-100x-text-primary">
-                  Event Details
-                </h2>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Date */}
-                <div className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-100x-accent-primary mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-100x-text-primary">
-                      {formattedDate}
-                    </p>
-                    <p className="text-xs text-100x-text-muted mt-0.5">
-                      Date
-                    </p>
-                  </div>
+          {/* Right Column: Event Info & Description */}
+          <div className="lg:col-span-7 space-y-12">
+            {/* Core Info */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="space-y-8"
+            >
+              <div className="space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-3 py-1 rounded-full bg-100x-accent-primary/10 text-100x-accent-primary text-xs font-bold uppercase tracking-widest border border-100x-accent-primary/20">
+                    {event.location_type}
+                  </span>
+                  {isFull && !isPastEvent && (
+                    <span className="px-3 py-1 rounded-full bg-red-500/10 text-red-500 text-xs font-bold uppercase tracking-widest border border-red-500/20">
+                      Full Capacity
+                    </span>
+                  )}
                 </div>
+                <h1 className="text-4xl md:text-5xl font-black leading-tight tracking-tight">
+                  {event.title}
+                </h1>
+              </div>
 
-                {/* Time */}
-                <div className="flex items-start gap-3">
-                  <Clock className="w-5 h-5 text-100x-accent-primary mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-100x-text-primary">
-                      {formattedTime} IST
-                    </p>
-                    <p className="text-xs text-100x-text-muted mt-0.5">
-                      Time
-                    </p>
-                  </div>
-                </div>
-
-                {/* Location Type */}
-                <div className="flex items-start gap-3">
-                  {locationIcon[event.location_type]}
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-100x-text-primary capitalize">
-                      {event.location_type}
-                    </p>
-                    {event.city && (
-                      <p className="text-xs text-100x-text-secondary mt-0.5">
-                        {event.city}
+              <div className="grid sm:grid-cols-2 gap-8 p-8 rounded-[32px] bg-zinc-900/40 border border-zinc-800/50">
+                {/* Date & Time */}
+                <div className="space-y-6">
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 bg-white/5 rounded-2xl flex flex-col items-center justify-center border border-white/10">
+                      <span className="text-[10px] font-bold text-zinc-500 uppercase">{format(istDate, 'MMM')}</span>
+                      <span className="text-lg font-black leading-none">{format(istDate, 'd')}</span>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="font-bold text-white leading-tight">
+                        {formattedDate}, {formattedYear}
                       </p>
-                    )}
-                    <p className="text-xs text-100x-text-muted mt-0.5">
-                      Location
-                    </p>
+                      <p className="text-sm font-medium text-zinc-500">
+                        Starting at {formattedTime} IST
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 text-100x-accent-primary">
+                      {locationIcon[event.location_type]}
+                    </div>
+                    <div className="space-y-1 text-zinc-400">
+                      <p className="font-bold text-white capitalize leading-tight">
+                        {event.location_type === 'online' ? 'Virtual Event' : (event.city || 'In-Person')}
+                      </p>
+                      <p className="text-sm font-medium">
+                        {event.location_type === 'online' ? 'Joining link upon registration' : (event.venue_address || 'Address visible to registered guests')}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Capacity */}
-                <div className="pt-4 border-t border-100x-border-default">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Users className="w-5 h-5 text-100x-accent-primary" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-100x-text-primary">
-                        {event.current_registrations} / {event.max_capacity} registered
+                {/* Quick Stats */}
+                <div className="space-y-6 border-t sm:border-t-0 sm:border-l border-zinc-800/50 pt-6 sm:pt-0 sm:pl-8">
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 text-zinc-400">
+                      <Users className="w-5 h-5" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="font-bold text-white leading-tight">
+                        {event.current_registrations} / {event.max_capacity}
                       </p>
-                      {isFull && (
-                        <p className="text-xs text-red-400 mt-0.5 font-semibold">
-                          Event is full
-                        </p>
-                      )}
+                      <p className="text-sm font-medium text-zinc-500">
+                        Guests Registered
+                      </p>
                     </div>
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="w-full bg-100x-bg-secondary rounded-full h-2 overflow-hidden">
-                    <div
-                      className={cn(
-                        'h-full transition-all duration-500',
-                        isFull ? 'bg-red-500' : 'bg-100x-accent-primary'
-                      )}
-                      style={{ width: `${capacityPercentage}%` }}
-                    />
+                  <div className="space-y-2 pt-2">
+                    <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(event.current_registrations / event.max_capacity) * 100}%` }}
+                        className={cn(
+                          "h-full transition-colors",
+                          isFull ? "bg-red-500" : "bg-100x-accent-primary"
+                        )}
+                      />
+                    </div>
+                    <p className="text-[10px] uppercase tracking-widest font-bold text-zinc-600">
+                      {Math.round((event.current_registrations / event.max_capacity) * 100)}% Capacity reached
+                    </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </motion.div>
 
-            {/* Registration Form */}
-            {!isPastEvent && !isFull && (
-              <RegistrationForm eventId={eventId} eventTitle={event.title} />
-            )}
-
-            {/* Registration Full Message */}
-            {!isPastEvent && isFull && (
-              <Card className="border-100x-border-default bg-100x-bg-tertiary">
-                <CardHeader>
-                  <h2 className="text-lg font-semibold text-100x-text-primary">
-                    Registration Full
-                  </h2>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-100x-text-secondary">
-                    This event has reached maximum capacity. Registration is closed.
+            {/* Registration Section (MOVED FROM LEFT) */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="max-w-xl"
+            >
+              {!isPastEvent && !isFull ? (
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <h3 className="text-2xl font-bold ">Take Your Seat</h3>
+                      <Sparkles className="w-5 h-5 text-100x-accent-primary animate-pulse" />
+                    </div>
+                    <p className="text-zinc-500 font-medium">Limited slots available. Beat the queue, secure your spot now!</p>
+                  </div>
+                  <RegistrationForm eventId={eventId} eventTitle={event.title} />
+                </div>
+              ) : (
+                <div className="p-8 rounded-[32px] bg-zinc-900/50 border border-zinc-800 text-center space-y-4 overflow-hidden relative group">
+                  <div className="absolute inset-0 bg-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-12 h-12 bg-zinc-800 rounded-2xl flex items-center justify-center mx-auto relative z-10">
+                    <AlertCircle className="w-6 h-6 text-zinc-400" />
+                  </div>
+                  <h3 className="text-xl font-bold relative z-10">
+                    {isPastEvent ? "Too late, Chief!" : "Capacity Full"}
+                  </h3>
+                  <p className="text-zinc-500 relative z-10">
+                    {isPastEvent
+                      ? "Event has been completed, you can register in more bangers! This one is already in the history books."
+                      : "We're packed! But don't worry, there's always more coming."}
                   </p>
-                </CardContent>
-              </Card>
-            )}
+                  <ShimmerButton
+                    onClick={() => router.push('/')}
+                    shimmerColor="#ffffff"
+                    background="#FF6B35"
+                    className="w-full text-black font-black transition-all rounded-xl"
+                  >
+                    Explore other Bangers
+                  </ShimmerButton>
+                </div>
+              )}
+            </motion.div>
           </div>
+
         </div>
-      </div>
+      </main>
+
+      {/* Footer / Copyright */}
+      <footer className="max-w-[1200px] mx-auto px-4 py-12 border-t border-zinc-900 text-center">
+        <p className="text-xs font-medium text-zinc-600">
+          © {new Date().getFullYear()} 100x Engineers. All rights reserved.
+        </p>
+      </footer>
     </div>
   )
 }

@@ -11,9 +11,10 @@ import { Profile } from '@/lib/types'
 interface NavigationProps {
   user?: Profile
   showSignIn?: boolean
+  actions?: React.ReactNode
 }
 
-export function Navigation({ user, showSignIn = true }: NavigationProps) {
+export function Navigation({ user, showSignIn = true, actions }: NavigationProps) {
   const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
@@ -61,7 +62,7 @@ export function Navigation({ user, showSignIn = true }: NavigationProps) {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-4">
-              {user ? (
+              {actions ? actions : user ? (
                 <>
                   <div className="text-sm text-100x-text-secondary">
                     <span className="text-100x-text-primary font-medium">{user.full_name}</span>

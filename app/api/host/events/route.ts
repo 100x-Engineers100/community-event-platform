@@ -118,6 +118,7 @@ export async function POST(request: Request) {
         meeting_link: eventData.meeting_link || null,
         venue_address: eventData.venue_address || null,
         max_capacity: eventData.max_capacity,
+        event_image_url: eventData.event_image_url || '/images/default-event-image.png',
         status: 'submitted'
       })
       .select()

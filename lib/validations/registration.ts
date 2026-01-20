@@ -17,6 +17,13 @@ export const registrationSchema = z.object({
     .toLowerCase()
     .trim(),
 
+  whatsapp_number: z
+    .string()
+    .min(10, 'WhatsApp number must be at least 10 digits')
+    .max(15, 'WhatsApp number must be less than 15 digits')
+    .regex(/^\+?[0-9\s-]{10,15}$/, 'Please enter a valid phone number')
+    .trim(),
+
   // Optional: Terms acceptance (not stored in DB, just for UX)
   terms_accepted: z
     .boolean()
@@ -34,7 +41,8 @@ export type RegistrationFormData = z.infer<typeof registrationSchema>;
  */
 export const registrationDBSchema = registrationSchema.pick({
   attendee_name: true,
-  attendee_email: true
+  attendee_email: true,
+  whatsapp_number: true
 });
 
 export type RegistrationDBData = z.infer<typeof registrationDBSchema>;

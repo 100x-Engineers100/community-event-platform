@@ -2,11 +2,14 @@
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { StatusBadge } from '@/components/StatusBadge'
-import { Event } from '@/lib/types'
+import Link from 'next/link'
+import { Profile, Event } from '@/lib/types'
+import { motion } from 'framer-motion'
 import { format } from 'date-fns'
 import { toZonedTime } from 'date-fns-tz'
-import { Calendar, MapPin, Users, Globe, Building2 } from 'lucide-react'
+import { Calendar, MapPin, Users, Globe, Building2, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { SafeImage } from './event/SafeImage'
 
 interface EventCardProps {
   event: Event
@@ -16,13 +19,13 @@ interface EventCardProps {
 export function EventCard({ event, className }: EventCardProps) {
   // Convert to IST for display
   const istDate = toZonedTime(new Date(event.event_date), 'Asia/Kolkata')
-  const formattedDate = format(istDate, 'PPP')
+  const formattedDate = format(istDate, 'MMM do')
   const formattedTime = format(istDate, 'p')
 
   const locationIcon = {
-    online: <Globe className="w-4 h-4" />,
-    offline: <Building2 className="w-4 h-4" />,
-    hybrid: <MapPin className="w-4 h-4" />
+    online: <Globe className="w-3.5 h-3.5" />,
+    offline: <Building2 className="w-3.5 h-3.5" />,
+    hybrid: <MapPin className="w-3.5 h-3.5" />
   }
 
   const isExpired = event.status === 'expired'
@@ -32,83 +35,97 @@ export function EventCard({ event, className }: EventCardProps) {
   return (
     <Card
       className={cn(
-        'group relative transition-all duration-300 border-100x-border-default bg-100x-bg-tertiary',
-        'hover:border-100x-accent-primary hover:shadow-[0_0_20px_rgba(249,104,70,0.2)]',
+        'group relative transition-all duration-500 border-zinc-800 bg-zinc-900/40 backdrop-blur-xl overflow-hidden rounded-[24px]',
+        'hover:border-100x-accent-primary/50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] hover:-translate-y-1',
         className
       )}
     >
-      {/* Expired/Rejected Banner */}
-      {isExpired && (
-        <div className="absolute -top-2 -right-2 bg-100x-accent-primary text-white text-xs px-3 py-1 rounded-full shadow-lg z-10">
-          Resubmit Available
-        </div>
-      )}
+      {/* Event Image */}
+      <div className="relative aspect-[16/10] w-full overflow-hidden">
+        <SafeImage
+          src={event.event_image_url}
+          alt={event.title}
+          className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
 
-      <CardHeader className="space-y-3">
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="text-lg font-semibold text-100x-text-primary line-clamp-2 flex-1">
-            {event.title}
-          </h3>
+        {/* Status Badge Over Image */}
+        <div className="absolute top-4 right-4">
           <StatusBadge status={event.status} />
         </div>
 
-        <p className="text-sm text-100x-text-secondary line-clamp-3">
-          {event.description}
-        </p>
-      </CardHeader>
+        {/* Floating Date Badge */}
+        <div className="absolute bottom-4 left-4 bg-white/10 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-xl flex items-center gap-2">
+          <Calendar className="w-3.5 h-3.5 text-100x-accent-primary" />
+          <span className="text-xs font-bold text-white tracking-tight">{formattedDate}</span>
+        </div>
+      </div>
 
-      <CardContent className="space-y-3">
-        {/* Date & Time */}
-        <div className="flex items-center gap-2 text-sm text-100x-text-secondary">
-          <Calendar className="w-4 h-4 text-100x-accent-primary" />
-          <span>{formattedDate} at {formattedTime} IST</span>
+      <div className="p-6 space-y-4">
+        <div className="space-y-2">
+          <h3 className="text-xl font-black text-white leading-tight line-clamp-1 group-hover:text-100x-accent-primary transition-colors">
+            {event.title}
+          </h3>
+          <p className="text-xs font-medium text-zinc-500 line-clamp-2 leading-relaxed">
+            {event.description}
+          </p>
         </div>
 
-        {/* Location */}
-        <div className="flex items-center gap-2 text-sm text-100x-text-secondary">
-          {locationIcon[event.location_type]}
-          <span className="capitalize">{event.location_type}</span>
-          {event.city && <span className="text-100x-text-muted">• {event.city}</span>}
+        <div className="flex flex-wrap gap-3 pt-2">
+          <div className="flex items-center gap-1.5 bg-zinc-800/50 px-2.5 py-1 rounded-full text-[10px] font-bold text-zinc-400 capitalize">
+            {locationIcon[event.location_type]}
+            {event.location_type}
+          </div>
+          {event.city && (
+            <div className="flex items-center gap-1.5 bg-zinc-800/50 px-2.5 py-1 rounded-full text-[10px] font-bold text-zinc-400">
+              <MapPin className="w-3.5 h-3.5" />
+              {event.city}
+            </div>
+          )}
         </div>
 
-        {/* Capacity (only for approved events) */}
-        {isApproved && (
-          <div className="flex items-center gap-2 text-sm">
-            <Users className="w-4 h-4 text-100x-accent-primary" />
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-100x-text-secondary">
-                  {event.current_registrations}/{event.max_capacity} registered
+        {/* Footer Area */}
+        <div className="pt-4 border-t border-zinc-800/50">
+          {isApproved ? (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider">
+                <span className="text-zinc-600">Attendance</span>
+                <span className={cn(
+                  event.current_registrations >= event.max_capacity ? "text-red-500" : "text-100x-accent-primary"
+                )}>
+                  {event.current_registrations} / {event.max_capacity}
                 </span>
-                {event.current_registrations >= event.max_capacity && (
-                  <span className="text-xs bg-red-900 text-white px-2 py-0.5 rounded">
-                    Full
-                  </span>
-                )}
               </div>
-              {/* Progress bar */}
-              <div className="mt-1.5 w-full bg-100x-bg-secondary rounded-full h-1.5 overflow-hidden">
+              <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
                 <div
-                  className="bg-100x-accent-primary h-full transition-all duration-300"
+                  className={cn(
+                    "h-full transition-all duration-500",
+                    isApproved ? "bg-100x-accent-primary" : "bg-zinc-700"
+                  )}
                   style={{
                     width: `${Math.min((event.current_registrations / event.max_capacity) * 100, 100)}%`
                   }}
                 />
               </div>
             </div>
-          </div>
-        )}
-
-        {/* Rejection Reason */}
-        {isRejected && event.rejection_reason && (
-          <div className="mt-3 p-3 bg-red-900/20 border border-red-900/40 rounded-md">
-            <p className="text-sm text-red-200">
-              <span className="font-semibold">Reason: </span>
-              {event.rejection_reason}
-            </p>
-          </div>
-        )}
-      </CardContent>
+          ) : isExpired ? (
+            <div className="flex items-center gap-2 text-100x-accent-primary">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Resubmit Ready</span>
+            </div>
+          ) : isRejected ? (
+            <div className="space-y-2">
+              <p className="text-[10px] font-bold text-red-400/80 line-clamp-1">
+                Rejected: {event.rejection_reason}
+              </p>
+            </div>
+          ) : (
+            <div className="text-[10px] font-bold text-zinc-600 italic">
+              Awaiting review from the high council...
+            </div>
+          )}
+        </div>
+      </div>
     </Card>
   )
 }

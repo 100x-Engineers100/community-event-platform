@@ -4,9 +4,11 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Event } from '@/lib/types'
 import { format } from 'date-fns'
 import { toZonedTime } from 'date-fns-tz'
-import { Calendar, MapPin, Users, Globe, Building2 } from 'lucide-react'
+import { Calendar, MapPin, Users, Globe, Building2, Clock } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import { SafeImage } from './event/SafeImage'
 
 interface PublicEventCardProps {
   event: Event
@@ -16,13 +18,13 @@ interface PublicEventCardProps {
 export function PublicEventCard({ event, className }: PublicEventCardProps) {
   // Convert to IST for display
   const istDate = toZonedTime(new Date(event.event_date), 'Asia/Kolkata')
-  const formattedDate = format(istDate, 'PPP')
+  const formattedDate = format(istDate, 'MMM do')
   const formattedTime = format(istDate, 'p')
 
   const locationIcon = {
-    online: <Globe className="w-4 h-4" />,
-    offline: <Building2 className="w-4 h-4" />,
-    hybrid: <MapPin className="w-4 h-4" />
+    online: <Globe className="w-3.5 h-3.5" />,
+    offline: <Building2 className="w-3.5 h-3.5" />,
+    hybrid: <MapPin className="w-3.5 h-3.5" />
   }
 
   const isFull = event.current_registrations >= event.max_capacity
@@ -32,82 +34,84 @@ export function PublicEventCard({ event, className }: PublicEventCardProps) {
   )
 
   return (
-    <Link href={`/events/${event.id}`} className="block">
+    <Link href={`/events/${event.id}`} className="block group">
       <Card
         className={cn(
-          'group relative transition-all duration-300 cursor-pointer',
-          'border-100x-border-default bg-100x-bg-tertiary',
-          'hover:border-100x-accent-primary hover:shadow-[0_0_20px_rgba(249,104,70,0.2)]',
-          'hover:translate-y-[-2px]',
+          'relative transition-all duration-500 border-zinc-800 bg-zinc-900/40 backdrop-blur-xl overflow-hidden rounded-[24px]',
+          'hover:border-100x-accent-primary/50 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] hover:-translate-y-1',
           className
         )}
       >
-        {/* Full Badge */}
-        {isFull && (
-          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-3 py-1 rounded-full shadow-lg z-10 font-semibold">
-            Full
-          </div>
-        )}
+        {/* Event Image */}
+        <div className="relative aspect-[16/10] w-full overflow-hidden">
+          <SafeImage
+            src={event.event_image_url}
+            alt={event.title}
+            className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
 
-        <CardHeader className="space-y-3">
-          <h3 className="text-xl font-bold text-100x-text-primary line-clamp-2 group-hover:text-100x-accent-light transition-colors">
-            {event.title}
-          </h3>
-
-          <p className="text-sm text-100x-text-secondary line-clamp-3 leading-relaxed">
-            {event.description}
-          </p>
-        </CardHeader>
-
-        <CardContent className="space-y-3">
-          {/* Date & Time */}
-          <div className="flex items-center gap-2 text-sm text-100x-text-secondary">
-            <Calendar className="w-4 h-4 text-100x-accent-primary" />
-            <span>
-              {formattedDate} <span className="text-100x-text-muted">•</span> {formattedTime} IST
-            </span>
-          </div>
-
-          {/* Location */}
-          <div className="flex items-center gap-2 text-sm text-100x-text-secondary">
-            {locationIcon[event.location_type]}
-            <span className="capitalize">{event.location_type}</span>
-            {event.city && <span className="text-100x-text-muted">• {event.city}</span>}
-          </div>
-
-          {/* Capacity */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm">
-              <Users className="w-4 h-4 text-100x-accent-primary" />
-              <span className="text-100x-text-secondary">
-                {event.current_registrations}/{event.max_capacity} registered
-              </span>
-              {isFull && (
-                <span className="text-xs text-red-400 font-semibold">
-                  • Event Full
-                </span>
-              )}
-            </div>
-
-            {/* Progress bar */}
-            <div className="w-full bg-100x-bg-secondary rounded-full h-2 overflow-hidden">
-              <div
-                className={cn(
-                  'h-full transition-all duration-500',
-                  isFull ? 'bg-red-500' : 'bg-100x-accent-primary'
-                )}
-                style={{ width: `${capacityPercentage}%` }}
-              />
+          {/* Status Badge (Capacity) Over Image */}
+          <div className="absolute top-4 right-4">
+            <div className={cn(
+              "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border backdrop-blur-md",
+              isFull
+                ? "bg-red-500/20 border-red-500/50 text-red-500"
+                : "bg-100x-accent-primary/20 border-100x-accent-primary/50 text-100x-accent-primary"
+            )}>
+              {isFull ? "Sold Out" : "Open"}
             </div>
           </div>
 
-          {/* Call to Action hint */}
-          <div className="pt-2 border-t border-100x-border-default mt-4">
-            <span className="text-xs text-100x-accent-light group-hover:text-100x-accent-primary transition-colors">
-              Click to view details {!isFull && '& register'}
-            </span>
+          {/* Floating Date Badge */}
+          <div className="absolute bottom-4 left-4 bg-white/10 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-xl flex items-center gap-2">
+            <Calendar className="w-3.5 h-3.5 text-100x-accent-primary" />
+            <span className="text-xs font-bold text-white tracking-tight">{formattedDate}</span>
           </div>
-        </CardContent>
+        </div>
+
+        <div className="p-4 md:p-5 space-y-3">
+          <div className="space-y-1">
+            <h3 className="text-lg font-black text-white leading-tight line-clamp-1 group-hover:text-100x-accent-primary transition-colors italic">
+              {event.title}
+            </h3>
+            <p className="text-[10px] font-medium text-zinc-500 line-clamp-2 leading-relaxed">
+              {event.description}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-2 pt-1">
+            <div className="flex items-center gap-1.5 bg-zinc-800/50 px-2 py-0.5 rounded-full text-[9px] font-bold text-zinc-400 capitalize">
+              {locationIcon[event.location_type]}
+              {event.location_type}
+            </div>
+            {event.city && (
+              <div className="flex items-center gap-1.5 bg-zinc-800/50 px-2 py-0.5 rounded-full text-[9px] font-bold text-zinc-400">
+                <MapPin className="w-3 h-3" />
+                {event.city}
+              </div>
+            )}
+            <div className="flex items-center gap-1.5 bg-zinc-800/50 px-2 py-0.5 rounded-full text-[9px] font-bold text-zinc-400">
+              <Clock className="w-3 h-3" />
+              {formattedTime}
+            </div>
+          </div>
+
+          {/* Footer Area */}
+          <div className="pt-3 border-t border-zinc-800/50 flex items-center justify-between">
+            <div className="space-y-0.5">
+              <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Attendance</span>
+              <div className="flex items-baseline gap-1">
+                <span className="text-xs font-black text-white">{event.current_registrations}</span>
+                <span className="text-[9px] font-bold text-zinc-600">/ {event.max_capacity}</span>
+              </div>
+            </div>
+
+            <div className="px-3 py-1.5 bg-white text-black text-[9px] font-black uppercase tracking-widest rounded-lg transition-all group-hover:bg-100x-accent-primary group-hover:text-white">
+              View Details
+            </div>
+          </div>
+        </div>
       </Card>
     </Link>
   )

@@ -10,19 +10,24 @@ import { createClient } from '@/lib/supabase/client'
 import { eventFormSchema, EventFormData } from '@/lib/validations/event'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { ShimmerButton } from '@/components/ui/shimmer-button'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft, Loader2, Info } from 'lucide-react'
 import Link from 'next/link'
+import { ImageUpload } from '@/components/event/ImageUpload'
+import { DateTimePicker } from '@/components/event/DateTimePicker'
+import { motion, AnimatePresence } from 'framer-motion'
+import { cn } from '@/lib/utils'
 
 export default function CreateEventPage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
+  const [userId, setUserId] = useState<string | null>(null)
 
   const {
     register,
@@ -34,11 +39,13 @@ export default function CreateEventPage() {
     resolver: zodResolver(eventFormSchema),
     defaultValues: {
       location_type: 'online',
-      max_capacity: 50
+      max_capacity: 50,
+      event_image_url: '/images/default-event-image.png'
     }
   })
 
   const locationType = watch('location_type')
+  const description = watch('description') || ''
 
   // Auth check
   useEffect(() => {
@@ -48,6 +55,7 @@ export default function CreateEventPage() {
       if (!user) {
         router.push('/login')
       } else {
+        setUserId(user.id)
         setIsCheckingAuth(false)
       }
     }
@@ -92,231 +100,264 @@ export default function CreateEventPage() {
   }
 
   return (
-    <div className="min-h-screen bg-100x-bg-primary">
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
-        {/* Back Button */}
-        <Link href="/dashboard">
-          <Button
-            variant="ghost"
-            className="mb-6 text-100x-text-secondary hover:text-100x-accent-primary hover:bg-100x-bg-secondary"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
-          </Button>
+    <div className="min-h-screen bg-black text-white selection:bg-100x-accent-primary/30">
+      <div className="max-w-[1200px] mx-auto px-4 py-8 md:py-12">
+        {/* Navigation */}
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center text-sm text-zinc-400 hover:text-100x-accent-primary transition-colors mb-8 group"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+          Back to Dashboard
         </Link>
 
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-100x-text-primary mb-2">
-            Create Event
+        <div className="mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+            Create an <span className="text-100x-accent-primary">Event</span>
           </h1>
-          <p className="text-100x-text-secondary">
-            Submit your event for review. All events are reviewed before publishing.
+          <p className="text-zinc-400 text-lg max-w-2xl">
+            Fill in the details below to submit your event for review.
           </p>
         </div>
 
-        {/* Error Alert */}
         {error && (
-          <Alert className="mb-6 bg-red-900/20 border-red-900/40">
-            <AlertDescription className="text-red-200">
-              {error}
-            </AlertDescription>
-          </Alert>
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex gap-3 text-red-400"
+          >
+            <Info className="w-5 h-5 flex-shrink-0" />
+            <p className="text-sm font-medium">{error}</p>
+          </motion.div>
         )}
 
-        {/* Form */}
-        <Card className="border-100x-border-default bg-100x-bg-tertiary">
-          <CardHeader>
-            <CardTitle className="text-100x-text-primary">Event Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* Title */}
-              <div>
-                <Label htmlFor="title" className="text-100x-text-primary">
-                  Event Title <span className="text-100x-accent-primary">*</span>
-                </Label>
-                <Input
-                  id="title"
-                  {...register('title')}
-                  placeholder="e.g., AI Workshop: Building LLM Applications"
-                  className="mt-1.5 bg-100x-bg-secondary border-100x-border-default text-100x-text-primary"
-                />
-                {errors.title && (
-                  <p className="text-red-400 text-sm mt-1">{errors.title.message}</p>
-                )}
-              </div>
-
-              {/* Description */}
-              <div>
-                <Label htmlFor="description" className="text-100x-text-primary">
-                  Description <span className="text-100x-accent-primary">*</span>
-                </Label>
-                <Textarea
-                  id="description"
-                  {...register('description')}
-                  placeholder="Describe your event (50-1000 characters)"
-                  rows={5}
-                  className="mt-1.5 bg-100x-bg-secondary border-100x-border-default text-100x-text-primary"
-                />
-                <p className="text-100x-text-muted text-xs mt-1">
-                  {watch('description')?.length || 0} / 1000 characters
+        <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          {/* Left Column: Image Upload (Sticky on Desktop) */}
+          <div className="lg:col-span-5 lg:sticky lg:top-8">
+            <div className="space-y-4">
+              <Label className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">
+                Event Cover
+              </Label>
+              <ImageUpload
+                userId={userId!}
+                onChange={(url) => setValue('event_image_url', url)}
+                onRemove={() => setValue('event_image_url', '/images/default-event-image.png')}
+                className="shadow-2xl shadow-100x-accent-primary/5"
+              />
+              <div className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800 flex gap-3 items-start">
+                <Info className="w-4 h-4 text-100x-accent-primary mt-0.5" />
+                <p className="text-xs text-zinc-500 leading-relaxed">
+                  Recommended size: 640x640px. This image will be shown on the event card and details page.
                 </p>
-                {errors.description && (
-                  <p className="text-red-400 text-sm mt-1">{errors.description.message}</p>
-                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Event Details Form */}
+          <div className="lg:col-span-7 space-y-12 pb-24">
+            {/* Section: Basic Info */}
+            <div className="space-y-8">
+              <div className="space-y-2 border-b border-zinc-900 pb-4">
+                <h2 className="text-xl font-semibold">General Information</h2>
+                <p className="text-sm text-zinc-500">The core details of your event.</p>
               </div>
 
-              {/* Date & Time */}
-              <div>
-                <Label htmlFor="event_date" className="text-100x-text-primary">
-                  Event Date & Time (IST) <span className="text-100x-accent-primary">*</span>
-                </Label>
-                <Input
-                  id="event_date"
-                  type="datetime-local"
-                  {...register('event_date')}
-                  className="mt-1.5 bg-100x-bg-secondary border-100x-border-default text-100x-text-primary"
-                />
-                {errors.event_date && (
-                  <p className="text-red-400 text-sm mt-1">{errors.event_date.message}</p>
-                )}
-              </div>
-
-              {/* Location Type */}
-              <div>
-                <Label htmlFor="location_type" className="text-100x-text-primary">
-                  Location Type <span className="text-100x-accent-primary">*</span>
-                </Label>
-                <Select
-                  value={locationType}
-                  onValueChange={(value) => setValue('location_type', value as 'online' | 'offline' | 'hybrid')}
-                >
-                  <SelectTrigger className="mt-1.5 bg-100x-bg-secondary border-100x-border-default text-100x-text-primary">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-100x-bg-secondary border-100x-border-default">
-                    <SelectItem value="online" className="text-100x-text-primary">Online</SelectItem>
-                    <SelectItem value="offline" className="text-100x-text-primary">Offline</SelectItem>
-                    <SelectItem value="hybrid" className="text-100x-text-primary">Hybrid</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Conditional: Meeting Link (Online/Hybrid) */}
-              {(locationType === 'online' || locationType === 'hybrid') && (
-                <div>
-                  <Label htmlFor="meeting_link" className="text-100x-text-primary">
-                    Meeting Link <span className="text-100x-accent-primary">*</span>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">
+                    Event Title
                   </Label>
                   <Input
-                    id="meeting_link"
-                    {...register('meeting_link')}
-                    placeholder="https://meet.google.com/xxx-xxxx-xxx"
-                    className="mt-1.5 bg-100x-bg-secondary border-100x-border-default text-100x-text-primary"
+                    id="title"
+                    {...register('title')}
+                    placeholder="E.g., Mumbai React Meetup"
+                    className="h-12 bg-zinc-900 border-zinc-800 focus:border-100x-accent-primary text-lg"
                   />
-                  {errors.meeting_link && (
-                    <p className="text-red-400 text-sm mt-1">{errors.meeting_link.message}</p>
+                  {errors.title && (
+                    <p className="text-red-400 text-xs font-medium mt-1">{errors.title.message}</p>
                   )}
                 </div>
-              )}
 
-              {/* Conditional: City (Offline/Hybrid) */}
-              {(locationType === 'offline' || locationType === 'hybrid') && (
-                <div>
-                  <Label htmlFor="city" className="text-100x-text-primary">
-                    City <span className="text-100x-accent-primary">*</span>
-                  </Label>
-                  <Input
-                    id="city"
-                    {...register('city')}
-                    placeholder="e.g., Bangalore"
-                    className="mt-1.5 bg-100x-bg-secondary border-100x-border-default text-100x-text-primary"
-                  />
-                  {errors.city && (
-                    <p className="text-red-400 text-sm mt-1">{errors.city.message}</p>
-                  )}
-                </div>
-              )}
-
-              {/* Conditional: Venue Address (Offline only) */}
-              {locationType === 'offline' && (
-                <div>
-                  <Label htmlFor="venue_address" className="text-100x-text-primary">
-                    Venue Address <span className="text-100x-accent-primary">*</span>
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">
+                    Description
                   </Label>
                   <Textarea
-                    id="venue_address"
-                    {...register('venue_address')}
-                    placeholder="Full venue address"
-                    rows={3}
-                    className="mt-1.5 bg-100x-bg-secondary border-100x-border-default text-100x-text-primary"
+                    id="description"
+                    {...register('description')}
+                    placeholder="Tell us what this event is about..."
+                    className="min-h-[160px] bg-zinc-900 border-zinc-800 focus:border-100x-accent-primary resize-none text-base p-4"
                   />
-                  {errors.venue_address && (
-                    <p className="text-red-400 text-sm mt-1">{errors.venue_address.message}</p>
+                  <div className="flex justify-between items-center px-1">
+                    <p className={cn(
+                      "text-[10px] font-medium uppercase tracking-tighter",
+                      description.length < 50 || description.length > 1000 ? "text-red-400" : "text-zinc-500"
+                    )}>
+                      {description.length} / 1000 Characters
+                    </p>
+                    {errors.description && (
+                      <p className="text-red-400 text-xs font-medium">{errors.description.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">
+                    Date & Time
+                  </Label>
+                  <DateTimePicker
+                    value={watch('event_date')}
+                    onChange={(val) => setValue('event_date', val)}
+                    error={errors.event_date?.message}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="max_capacity" className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">
+                    Max Capacity
+                  </Label>
+                  <Input
+                    id="max_capacity"
+                    type="number"
+                    {...register('max_capacity', { valueAsNumber: true })}
+                    className="h-12 bg-zinc-900 border-zinc-800 focus:border-100x-accent-primary text-base"
+                  />
+                  {errors.max_capacity && (
+                    <p className="text-red-400 text-xs font-medium mt-1">{errors.max_capacity.message}</p>
                   )}
                 </div>
-              )}
+              </div>
+            </div>
 
-              {/* Max Capacity */}
-              <div>
-                <Label htmlFor="max_capacity" className="text-100x-text-primary">
-                  Max Capacity <span className="text-100x-accent-primary">*</span>
-                </Label>
-                <Input
-                  id="max_capacity"
-                  type="number"
-                  {...register('max_capacity', { valueAsNumber: true })}
-                  min={5}
-                  max={500}
-                  className="mt-1.5 bg-100x-bg-secondary border-100x-border-default text-100x-text-primary"
-                />
-                <p className="text-100x-text-muted text-xs mt-1">
-                  Minimum 5, Maximum 500 attendees
-                </p>
-                {errors.max_capacity && (
-                  <p className="text-red-400 text-sm mt-1">{errors.max_capacity.message}</p>
-                )}
+            {/* Section: Location */}
+            <div className="space-y-8">
+              <div className="space-y-2 border-b border-zinc-900 pb-4">
+                <h2 className="text-xl font-semibold">Location & Format</h2>
+                <p className="text-sm text-zinc-500">Where will your event take place?</p>
               </div>
 
-              {/* Submit Button */}
-              <div className="flex gap-4 pt-4">
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex-1 bg-100x-accent-primary hover:bg-100x-accent-primary/90 text-white"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    'Submit Event'
-                  )}
-                </Button>
-                <Link href="/dashboard" className="flex-1">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={isSubmitting}
-                    className="w-full border-100x-border-default text-100x-text-secondary hover:text-100x-accent-primary"
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">
+                    Location Type
+                  </Label>
+                  <Select
+                    value={locationType}
+                    onValueChange={(value) => setValue('location_type', value as any)}
                   >
-                    Cancel
-                  </Button>
-                </Link>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+                    <SelectTrigger className="h-12 bg-zinc-900 border-zinc-800 focus:border-100x-accent-primary text-base">
+                      <SelectValue placeholder="Select location type" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-zinc-900 border-zinc-800">
+                      <SelectItem value="online">Online Event</SelectItem>
+                      <SelectItem value="offline">In-Person (Offline)</SelectItem>
+                      <SelectItem value="hybrid">Hybrid (Both)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-        {/* Info Card */}
-        <Alert className="mt-6 bg-100x-bg-secondary border-100x-border-default">
-          <AlertDescription className="text-100x-text-secondary text-sm">
-            <strong className="text-100x-text-primary">Note:</strong> Events are reviewed within 7 days.
-            If not reviewed, they will expire and you can resubmit. You can submit up to 3 events per day.
-          </AlertDescription>
-        </Alert>
+                <AnimatePresence mode="wait">
+                  {/* online/hybrid link */}
+                  {(locationType === 'online' || locationType === 'hybrid') && (
+                    <motion.div
+                      key="online-link"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden space-y-2 pt-2"
+                    >
+                      <Label htmlFor="meeting_link" className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">
+                        Meeting Link
+                      </Label>
+                      <Input
+                        id="meeting_link"
+                        {...register('meeting_link')}
+                        placeholder="https://zoom.us/j/..."
+                        className="h-12 bg-zinc-900 border-zinc-800 focus:border-100x-accent-primary"
+                      />
+                      {errors.meeting_link && (
+                        <p className="text-red-400 text-xs font-medium mt-1">{errors.meeting_link.message}</p>
+                      )}
+                    </motion.div>
+                  )}
+
+                  {/* offline/hybrid city */}
+                  {(locationType === 'offline' || locationType === 'hybrid') && (
+                    <motion.div
+                      key="offline-city"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden space-y-6 pt-2"
+                    >
+                      <div className="space-y-2">
+                        <Label htmlFor="city" className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">
+                          City
+                        </Label>
+                        <Input
+                          id="city"
+                          {...register('city')}
+                          placeholder="Mumbai"
+                          className="h-12 bg-zinc-900 border-zinc-800 focus:border-100x-accent-primary"
+                        />
+                        {errors.city && (
+                          <p className="text-red-400 text-xs font-medium mt-1">{errors.city.message}</p>
+                        )}
+                      </div>
+
+                      {locationType === 'offline' && (
+                        <div className="space-y-2">
+                          <Label htmlFor="venue_address" className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">
+                            Venue Address
+                          </Label>
+                          <Textarea
+                            id="venue_address"
+                            {...register('venue_address')}
+                            placeholder="Exact venue location details..."
+                            className="bg-zinc-900 border-zinc-800 focus:border-100x-accent-primary min-h-[100px]"
+                          />
+                          {errors.venue_address && (
+                            <p className="text-red-400 text-xs font-medium mt-1">{errors.venue_address.message}</p>
+                          )}
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Submission Area */}
+            <div className="pt-12 border-t border-zinc-900 flex flex-col sm:flex-row gap-4">
+              <ShimmerButton
+                type="submit"
+                disabled={isSubmitting}
+                shimmerColor="#ffffff"
+                background="#FF6B35"
+                className="h-14 flex-1 text-black font-bold text-lg rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Creating...</span>
+                  </div>
+                ) : (
+                  "Create Event"
+                )}
+              </ShimmerButton>
+              <Link href="/dashboard" className="sm:w-32">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-14 w-full border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-xl"
+                >
+                  Cancel
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
   )

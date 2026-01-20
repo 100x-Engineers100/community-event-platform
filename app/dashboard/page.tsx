@@ -5,14 +5,16 @@ import { redirect } from 'next/navigation'
 import { Navigation } from '@/components/Navigation'
 import { EventCard } from '@/components/EventCard'
 import { Button } from '@/components/ui/button'
-import { SplineScene } from "@/components/ui/splite"
+import { DashboardCanvasEffect } from "@/components/dashboard/DashboardCanvasEffect"
 import { Spotlight } from "@/components/ui/spotlight"
 import { MouseSpotlight } from "@/components/ui/mouse-spotlight"
 import { Card } from "@/components/ui/card"
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Plus, Calendar } from 'lucide-react'
+import { Plus, Sparkles, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { Profile, Event } from '@/lib/types'
+import { DashboardEmptyState } from '@/components/dashboard/DashboardEmptyState'
+import { ShimmerButton } from '@/components/ui/shimmer-button'
 
 async function getDashboardData() {
   const supabase = await createClient()
@@ -70,103 +72,138 @@ export default async function DashboardPage() {
   const hasEvents = events.length > 0
 
   return (
-    <div className="min-h-screen bg-100x-bg-primary">
+    <div className="min-h-screen bg-black selection:bg-100x-accent-primary/30">
       <Navigation user={profile} />
 
-      <main className="container mx-auto px-4 py-8 pt-24 max-w-7xl">
-        {/* Hero Section */}
-        <Card className="w-full h-[500px] bg-black/[0.96] relative overflow-hidden mb-8 border-100x-border-default group">
-          <Spotlight
-            className="-top-40 left-0 md:left-60 md:-top-20"
-            fill="white"
-          />
-          <MouseSpotlight size={300} />
+      <main className="container mx-auto px-4 py-8 pt-24 max-w-7xl space-y-12">
+        {/* Welcome Hero */}
+        <section className="relative">
+          <Card className="w-full h-[500px] bg-zinc-900 backdrop-blur-3xl relative overflow-hidden border-zinc-800 rounded-[40px] group shadow-2xl">
+            <DashboardCanvasEffect />
 
-          <div className="flex flex-col md:flex-row h-full">
-            {/* Left content */}
-            <div className="flex-1 p-8 relative z-10 flex flex-col justify-center">
-              <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400">
-                My Events
-              </h1>
-              <p className="mt-4 text-neutral-300 max-w-lg">
-                Manage your event submissions and track their status.
-                Bring your community together with immersive experiences.
+            <div className="flex flex-col md:flex-row h-full relative z-10">
+              {/* Left content */}
+              <div className="max-w-2xl p-10 md:p-16 flex flex-col justify-center space-y-6">
+                <div className="space-y-2">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-100x-accent-primary/10 border border-100x-accent-primary/20 text-100x-accent-primary text-[10px] font-black uppercase tracking-widest">
+                    <Sparkles className="w-3 h-3" />
+                    Host Portal
+                  </div>
+                  <h1 className="text-5xl md:text-7xl font-black text-white leading-tight tracking-tight">
+                    Your <span className="text-100x-accent-primary italic">Empire.</span>
+                  </h1>
+                </div>
+                <p className="text-zinc-400 font-medium text-lg max-w-md leading-relaxed">
+                  Manage your events, track registrations, and grow your community of legendary 100x Engineers.
+                </p>
+
+                <div className="pt-4 flex flex-wrap gap-4">
+                  <Link href="/create-event">
+                    <ShimmerButton
+                      disabled={!canSubmit}
+                      shimmerColor="#ffffff"
+                      background="#FF6B35"
+                      className="h-12 px-5 text-black font-black text-lg rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-100x-accent-primary/20 disabled:opacity-50"
+                    >
+                      <Plus className="w-5 h-5 mr-2" />
+                      Create Event
+                    </ShimmerButton>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </section>
+
+        {/* Status Dashboard Area */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Submission Power Bar */}
+          <Card className="md:col-span-2 p-8 bg-zinc-900/50 border-zinc-800 rounded-[32px] flex items-center justify-between gap-8 overflow-hidden group">
+            <div className="space-y-2 relative z-10">
+              <h3 className="text-xs font-black text-zinc-600 uppercase tracking-widest">Submission Power</h3>
+              <div className="flex items-baseline gap-2">
+                <span className="text-4xl font-black text-white">{currentCount}</span>
+                <span className="text-xl font-bold text-zinc-700">/ {maxLimit}</span>
+                <span className="text-xs font-medium text-zinc-500 ml-2">left for today</span>
+              </div>
+            </div>
+
+            <div className="flex-1 max-w-xs space-y-3 relative z-10">
+              <div className="w-full h-3 bg-zinc-800 rounded-full overflow-hidden border border-zinc-700/50">
+                <div
+                  className="h-full bg-gradient-to-r from-100x-accent-primary to-orange-400 transition-all duration-1000"
+                  style={{ width: `${(currentCount / maxLimit) * 100}%` }}
+                />
+              </div>
+              <p className="text-[10px] font-bold text-zinc-500 text-right uppercase tracking-wider">
+                {!canSubmit ? "Limit reached! Rest up, champ." : "You've got ideas. We've got slots."}
               </p>
             </div>
+          </Card>
 
-            {/* Right content */}
-            <div className="flex-1 relative min-h-[300px] md:min-h-full">
-              <SplineScene
-                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-                className="w-full h-full"
-              />
+          {/* Quick Stat (Experimental) */}
+          <Card className="p-8 bg-zinc-950/40 border-zinc-800/80 backdrop-blur-2xl rounded-[32px] space-y-2 relative overflow-hidden group cursor-pointer transition-all hover:border-100x-accent-primary/50 hover:shadow-[0_20px_40px_-20px_rgba(255,107,53,0.3)]">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-100x-accent-primary/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+
+
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-100x-accent-primary animate-pulse shadow-[0_0_8px_rgba(255,107,53,1)]" />
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Live Impact</h3>
             </div>
-          </div>
-        </Card>
 
-        {/* Submission Limit Alert */}
-        <div className="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <Alert className="flex-1 bg-100x-bg-secondary border-100x-border-default">
-            <AlertDescription className="text-100x-text-secondary">
-              <span className="text-100x-accent-primary font-semibold">
-                {currentCount}/{maxLimit}
-              </span>{' '}
-              submissions today
-              {!canSubmit && ' - Limit reached. Try again tomorrow.'}
-            </AlertDescription>
-          </Alert>
+            <div className="flex items-baseline gap-1">
+              <span className="text-4xl font-black text-white group-hover:text-100x-accent-primary transition-colors duration-500">
+                {events.reduce((acc, e) => acc + (e.current_registrations || 0), 0)}
+              </span>
+            </div>
 
-          <Link href="/create-event">
-            <Button
-              disabled={!canSubmit}
-              className="bg-100x-accent-primary hover:bg-100x-accent-primary/90 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Create Event
-            </Button>
-          </Link>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-600 group-hover:text-zinc-400 transition-colors flex items-center gap-2">
+              Engineers reached!!
+            </p>
+          </Card>
         </div>
 
         {/* Expired Events Banner */}
         {hasExpiredEvents && (
-          <Alert className="mb-6 bg-100x-accent-primary/10 border-100x-accent-primary">
-            <AlertDescription className="text-100x-text-primary">
-              Some of your events expired without review. You can resubmit them as new events.
-            </AlertDescription>
+          <Alert className="bg-100x-accent-primary/10 border-100x-accent-primary/30 rounded-2xl p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-100x-accent-primary rounded-xl flex items-center justify-center text-black">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <AlertDescription className="text-zinc-300 font-medium">
+                Wait! Some of your events expired without review. <span className="text-white font-bold underline cursor-pointer">Resubmit them</span> and let's get them published!
+              </AlertDescription>
+            </div>
           </Alert>
         )}
 
         {/* Events Grid */}
-        {hasEvents ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {events.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
-        ) : (
-          // Empty State
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-20 h-20 bg-100x-bg-secondary rounded-full flex items-center justify-center mb-6">
-              <Calendar className="w-10 h-10 text-100x-text-muted" />
-            </div>
-            <h2 className="text-2xl font-semibold text-100x-text-primary mb-2">
-              No events yet
+        <section className="space-y-8">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
+              Your Creations
+              <span className="text-zinc-800 text-lg">/</span>
+              <span className="text-zinc-600 font-bold text-lg">{events.length}</span>
             </h2>
-            <p className="text-100x-text-secondary mb-6 max-w-md">
-              Create your first community event and share it with the 100x Engineers community.
-            </p>
-            <Link href="/create-event">
-              <Button
-                disabled={!canSubmit}
-                className="bg-100x-accent-primary hover:bg-100x-accent-primary/90 text-white"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Create Your First Event
-              </Button>
-            </Link>
           </div>
-        )}
+
+          {hasEvents ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {events.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+          ) : (
+            <DashboardEmptyState canSubmit={canSubmit} />
+          )}
+        </section>
       </main>
+
+      <footer className="container mx-auto px-4 py-20 border-t border-zinc-900 text-center">
+        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-zinc-800">
+          The 100x Engineers Host Experience
+        </p>
+      </footer>
     </div>
   )
 }

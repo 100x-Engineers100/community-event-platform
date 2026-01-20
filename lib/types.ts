@@ -41,6 +41,7 @@ export interface Event {
   reviewed_at: string | null
   reviewed_by: string | null
   expires_at: string
+  event_image_url: string
 }
 
 export interface Registration {
@@ -48,12 +49,14 @@ export interface Registration {
   event_id: string
   attendee_name: string
   attendee_email: string
+  whatsapp_number?: string
   registered_at: string
 }
 
 export interface DailySubmission {
   id: string
-  host_id: string
-  submission_date: string
-  submission_count: number
+  email: string
+  whatsapp_number?: string
+  registration_date: string
+  status: 'pending' | 'confirmed' | 'cancelled'
 }
