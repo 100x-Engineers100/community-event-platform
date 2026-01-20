@@ -1,14 +1,9 @@
-export const dynamic = 'force-dynamic'
-
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Navigation } from '@/components/Navigation'
 import { EventCard } from '@/components/EventCard'
 import { Button } from '@/components/ui/button'
-import { DashboardCanvasEffect } from "@/components/dashboard/DashboardCanvasEffect"
-import { Spotlight } from "@/components/ui/spotlight"
-import { MouseSpotlight } from "@/components/ui/mouse-spotlight"
-import { Card } from "@/components/ui/card"
+import { Card } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Plus, Sparkles, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
@@ -79,7 +74,12 @@ export default async function DashboardPage() {
         {/* Welcome Hero */}
         <section className="relative">
           <Card className="w-full h-[500px] bg-zinc-900 backdrop-blur-3xl relative overflow-hidden border-zinc-800 rounded-[40px] group shadow-2xl">
-            <DashboardCanvasEffect />
+            {/* Simple Gradient Background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-100x-accent-primary/10 via-transparent to-transparent opacity-50" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-100x-accent-primary/20 via-transparent to-transparent" />
+
+            {/* Animated Glow Effect */}
+            <div className="absolute -right-20 -top-20 w-96 h-96 bg-100x-accent-primary/20 rounded-full blur-3xl animate-pulse" />
 
             <div className="flex flex-col md:flex-row h-full relative z-10">
               {/* Left content */}
