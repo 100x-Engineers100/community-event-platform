@@ -224,12 +224,19 @@ export default function EventReviewPage() {
 
   return (
     <div className="min-h-screen bg-100x-bg-primary text-100x-text-primary">
-      <Navigation />
-      <main className="container mx-auto px-4 py-8 max-w-5xl">
-        <Button onClick={() => router.push('/admin/pending')} variant="outline" className="mb-6 border-100x-border-default hover:bg-100x-bg-secondary group">
-          <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
-          Back to Queue
-        </Button>
+      <Navigation
+        actions={
+          <Button
+            onClick={() => router.push('/admin/pending')}
+            variant="outline"
+            className="border-100x-border-default hover:bg-100x-bg-secondary group"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+            Back to Queue
+          </Button>
+        }
+      />
+      <main className="container mx-auto px-4 py-8 pt-24 max-w-5xl">
 
         <div className="mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-100x-text-primary">{title}</h1>

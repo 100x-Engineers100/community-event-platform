@@ -88,7 +88,7 @@ export default function PendingEventsPage() {
       </div>
     );
   };
-  
+
   const renderContent = () => {
     if (loading) {
       return (
@@ -97,16 +97,16 @@ export default function PendingEventsPage() {
         </div>
       );
     }
-    
+
     if (error) {
-        return (
-          <div className="flex flex-col items-center justify-center text-center py-20">
-            <AlertTriangle className="w-16 h-16 text-red-400 mb-6" />
-            <h2 className="text-3xl font-bold text-red-400 mb-4">An Error Occurred</h2>
-            <p className="text-100x-text-secondary max-w-md">{error}</p>
-          </div>
-        );
-      }
+      return (
+        <div className="flex flex-col items-center justify-center text-center py-20">
+          <AlertTriangle className="w-16 h-16 text-red-400 mb-6" />
+          <h2 className="text-3xl font-bold text-red-400 mb-4">An Error Occurred</h2>
+          <p className="text-100x-text-secondary max-w-md">{error}</p>
+        </div>
+      );
+    }
 
     if (events.length === 0) {
       return (
@@ -146,11 +146,11 @@ export default function PendingEventsPage() {
                     >
                       <TableCell className="font-medium">
                         <div className="max-w-xs flex items-center gap-3">
-                           <div className={cn("w-2 h-2 rounded-full", isUrgent ? "bg-red-500 animate-pulse" : "bg-100x-accent-primary")}></div>
-                           <div>
+                          <div className={cn("w-2 h-2 rounded-full", isUrgent ? "bg-red-500 animate-pulse" : "bg-100x-accent-primary")}></div>
+                          <div>
                             <p className="text-100x-text-primary truncate font-bold">{event.title}</p>
                             <p className="text-sm text-100x-text-muted truncate">{event.description.substring(0, 40)}...</p>
-                           </div>
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -159,9 +159,9 @@ export default function PendingEventsPage() {
                       </TableCell>
                       <TableCell className="text-100x-text-secondary text-sm">
                         <div className="flex flex-col gap-2">
-                           <LocationInfo type={event.location_type} city={event.city} />
-                           <div className="flex items-center gap-2"><Users className="w-4 h-4" /><span>{event.max_capacity}</span></div>
-                           <div className="flex items-center gap-2"><Calendar className="w-4 h-4" /><span>{format(toZonedTime(new Date(event.event_date), 'Asia/Kolkata'), 'MMM dd, yyyy')}</span></div>
+                          <LocationInfo type={event.location_type} city={event.city} />
+                          <div className="flex items-center gap-2"><Users className="w-4 h-4" /><span>{event.max_capacity}</span></div>
+                          <div className="flex items-center gap-2"><Calendar className="w-4 h-4" /><span>{format(toZonedTime(new Date(event.event_date), 'Asia/Kolkata'), 'MMM dd, yyyy')}</span></div>
                         </div>
                       </TableCell>
                       <TableCell className="text-100x-text-muted text-sm">
@@ -172,8 +172,8 @@ export default function PendingEventsPage() {
                           variant="outline"
                           className={cn(
                             "font-bold",
-                            isUrgent 
-                              ? 'border-red-500/30 text-red-400' 
+                            isUrgent
+                              ? 'border-red-500/30 text-red-400'
                               : 'border-100x-accent-primary/30 text-100x-accent-primary'
                           )}
                         >
@@ -194,27 +194,27 @@ export default function PendingEventsPage() {
 
   return (
     <div className="min-h-screen bg-100x-bg-primary text-100x-text-primary">
-      <Navigation />
+      <Navigation showSignIn={false} />
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="mb-8">
-            <Button
-              onClick={() => router.push('/admin')}
-              variant="outline"
-              className="mb-6 border-100x-border-default hover:bg-100x-bg-secondary"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
-            <div className="flex items-center justify-between">
-                <div className='text-center w-full'>
-                    <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-100x-accent-primary/80 to-100x-accent-primary">
-                        Pending Review Queue
-                    </h1>
-                    <p className="text-100x-text-secondary mt-3 max-w-2xl mx-auto">
-                        {loading ? 'Fetching events...' : `You have ${events.length} events awaiting your approval.`}
-                    </p>
-                </div>
+          <Button
+            onClick={() => router.push('/admin')}
+            variant="outline"
+            className="mb-6 border-100x-border-default hover:bg-100x-bg-secondary"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Dashboard
+          </Button>
+          <div className="flex items-center justify-between">
+            <div className='text-center w-full'>
+              <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-100x-accent-primary/80 to-100x-accent-primary">
+                Pending Review Queue
+              </h1>
+              <p className="text-100x-text-secondary mt-3 max-w-2xl mx-auto">
+                {loading ? 'Fetching events...' : `You have ${events.length} events awaiting your approval.`}
+              </p>
             </div>
+          </div>
         </div>
 
         {renderContent()}
