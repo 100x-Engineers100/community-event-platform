@@ -13,6 +13,7 @@ import { Loader2, Calendar, Sparkles, MapPin, Globe, Clock, ArrowRight } from 'l
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import { AccordionRoot, AccordionItemV2, AccordionTriggerV2, AccordionContentV2 } from "@/components/ui/accordion"
 
 export default function Home() {
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([])
@@ -76,7 +77,7 @@ export default function Home() {
                 <span className="text-100x-accent-primary">Community Events</span>
               </h1>
 
-              <p className="text-zinc-400 text-base md:text-1xl max-w-md font-medium leading-relaxed">
+              <p className="text-zinc-400 text-base md:text-1xl max-w-md font-mono leading-relaxed">
                 Everything happening in the 100x community, in one place.
                 Workshops, talks, jam sessions, and peer-led events by 100x alumni and members.
               </p>
@@ -94,7 +95,7 @@ export default function Home() {
                   <ShimmerButton
                     shimmerColor="#ffffff"
                     background="#1a1a1a"
-                    className="h-12 px-5 border border-zinc-800 text-white font-black text-lg rounded-2xl hover:bg-zinc-900"
+                    className="h-12 px-5 border border-zinc-800 text-white dark:text-white font-black text-lg rounded-2xl hover:bg-zinc-900"
                   >
                     Host a community event
                   </ShimmerButton>
@@ -134,12 +135,13 @@ export default function Home() {
         <section className="container mx-auto px-4 py-16 border-t border-zinc-900/50">
           <div className="max-w-2xl mx-auto space-y-6 text-center">
             <h2 className="text-3xl font-black tracking-tight text-white">Why this exists</h2>
-            <div className="space-y-1 text-zinc-300 font-medium leading-relaxed">
+            <div className="space-y-1 text-zinc-300 font-mono leading-relaxed">
               A lot happens in the 100x community outside scheduled lectures.<br />
               Sessions get planned and hosted by members, but often get lost across different places.
               This space exists so community events are easy to find, easy to join, and easy to share with everyone who belongs here.
             </div>
-            {/* Placeholder for FAQ */}
+
+
           </div>
         </section>
 
@@ -262,12 +264,50 @@ export default function Home() {
               <ShimmerButton
                 background="#ffffff"
                 shimmerColor="#FF6B35"
-                className="h-14 px-8 text-black font-black text-xl rounded-2xl group transition-all"
+                className="h-14 px-10 text-black font-black text-xl rounded-2xl group transition-all"
               >
                 Host a community event
                 <ArrowRight className="w-6 h-6 ml-3 transition-transform group-hover:translate-x-1" />
               </ShimmerButton>
             </Link>
+          </div>
+        </section>
+        {/* FAQ Section (Moved to Bottom) */}
+        <section className="container mx-auto px-4 py-24 border-t border-zinc-900/50">
+          <div className="max-w-2xl mx-auto">
+            <h3 className="text-2xl font-black text-white mb-8 font-mono tracking-tight text-center">Frequently asked questions</h3>
+            <AccordionRoot>
+              <AccordionItemV2 value="item-1">
+                <AccordionTriggerV2>How many events can I host per day?</AccordionTriggerV2>
+                <AccordionContentV2>
+                  You can submit up to 3 events per day. This limit resets at midnight server time. If you've reached your daily limit, you'll need to wait until the next day to submit more events.
+                </AccordionContentV2>
+              </AccordionItemV2>
+              <AccordionItemV2 value="item-2">
+                <AccordionTriggerV2>Can I edit my event after submitting it?</AccordionTriggerV2>
+                <AccordionContentV2>
+                  No, events cannot be edited after submission. Once submitted, your event enters the review queue. If you need changes, you'll need to contact an admin or wait for it to be reviewed/rejected, then resubmit with corrections.
+                </AccordionContentV2>
+              </AccordionItemV2>
+              <AccordionItemV2 value="item-3">
+                <AccordionTriggerV2>What happens if my event isn't reviewed in time?</AccordionTriggerV2>
+                <AccordionContentV2>
+                  Events that aren't reviewed within 7 days automatically expire. You'll see an "Expired" banner on your dashboard and can resubmit the event with the same or updated details.
+                </AccordionContentV2>
+              </AccordionItemV2>
+              <AccordionItemV2 value="item-4">
+                <AccordionTriggerV2>When will I see the meeting link for an event?</AccordionTriggerV2>
+                <AccordionContentV2>
+                  Meeting links are only visible after you successfully register for an event. They're not shown on the public event page to protect privacy and prevent unauthorized access.
+                </AccordionContentV2>
+              </AccordionItemV2>
+              <AccordionItemV2 value="item-5">
+                <AccordionTriggerV2>Can I register for an event that's already full?</AccordionTriggerV2>
+                <AccordionContentV2>
+                  No, once an event reaches maximum capacity, registration closes. The event page will show a "Full" badge. Check back later as the organizers may increase capacity or consider attending future events.
+                </AccordionContentV2>
+              </AccordionItemV2>
+            </AccordionRoot>
           </div>
         </section>
       </main>

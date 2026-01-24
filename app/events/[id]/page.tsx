@@ -171,7 +171,7 @@ export default function EventDetailPage() {
             >
               <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
                 <div className="w-1.5 h-1.5 bg-100x-accent-primary rounded-full animate-pulse" />
-                <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">About the event</span>
+                <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">About the event</span>
               </div>
 
               <div className="space-y-8">

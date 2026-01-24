@@ -173,7 +173,7 @@ export default function RegistrationForm({ eventId, eventTitle }: RegistrationFo
           disabled={isSubmitting}
           shimmerColor="#ffffff"
           background="#FF6B35"
-          className="w-full text-black font-bold py-6 uppercase tracking-wider rounded-lg disabled:opacity-50 transition-all hover:scale-[1.01] active:scale-[0.99]"
+          className="w-full text-black font-bold py-4 uppercase tracking-wider rounded-lg disabled:opacity-50 transition-all hover:scale-[1.01] active:scale-[0.99]"
         >
           {isSubmitting ? (
             <>
