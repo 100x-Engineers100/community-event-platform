@@ -80,7 +80,7 @@ export default function RegistrationForm({ eventId, eventTitle }: RegistrationFo
     <div className="bg-100x-bg-tertiary border border-100x-border-default rounded-lg p-6">
       <div className="flex items-center gap-2 mb-4">
         <UserCheck className="w-5 h-5 text-100x-accent-primary" />
-        <h3 className="text-lg font-semibold text-100x-text-primary">Register for this Event</h3>
+        <h3 className="text-lg font-semibold text-100x-text-primary">Event registration</h3>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -126,6 +126,7 @@ export default function RegistrationForm({ eventId, eventTitle }: RegistrationFo
         <div className="space-y-2">
           <Label htmlFor="whatsapp_number" className="text-100x-text-primary">
             WhatsApp Number <span className="text-100x-accent-primary">*</span>
+            <span className="block text-xs text-zinc-500 font-normal mt-1">Used only for event-related updates.</span>
           </Label>
           <Input
             id="whatsapp_number"
@@ -151,7 +152,7 @@ export default function RegistrationForm({ eventId, eventTitle }: RegistrationFo
             disabled={isSubmitting}
           />
           <Label htmlFor="terms_accepted" className="text-sm text-100x-text-secondary cursor-pointer">
-            I agree to receive event updates and understand that my information will be used to contact me about this event.
+            I agree to receive event-related updates for this session.
           </Label>
         </div>
         {errors.terms_accepted && (
@@ -180,12 +181,12 @@ export default function RegistrationForm({ eventId, eventTitle }: RegistrationFo
               Registering...
             </>
           ) : (
-            'Register Now'
+            'Register'
           )}
         </ShimmerButton>
 
         <p className="text-xs text-100x-text-muted text-center">
-          Registration is free. You'll receive event details after registering.
+          Registration is free. You will receive joining details after registering.
         </p>
       </form>
     </div>

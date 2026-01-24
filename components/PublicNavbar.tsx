@@ -45,7 +45,7 @@ export function PublicNavbar() {
 
               <Link href="/login">
                 <Button className="bg-100x-accent-primary hover:bg-100x-accent-primary/90 text-white transition-all duration-300">
-                  Become a Host
+                  Host a community event
                 </Button>
               </Link>
             </div>
@@ -79,7 +79,7 @@ export function PublicNavbar() {
               variant="outline"
               className="w-full border-100x-accent-primary text-100x-accent-primary hover:bg-100x-accent-primary hover:text-white transition-all"
             >
-              Become a Host
+              Host a community event
             </Button>
           </Link>
 

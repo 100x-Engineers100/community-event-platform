@@ -161,7 +161,7 @@ export default function ConfirmationPage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-4xl md:text-6xl font-black tracking-tight"
             >
-              Boom! You're <span className="text-100x-accent-primary italic">In.</span>
+              You’re registered.
             </motion.h1>
             <motion.p
               initial={{ opacity: 0 }}
@@ -169,7 +169,9 @@ export default function ConfirmationPage() {
               transition={{ delay: 0.3 }}
               className="text-zinc-500 text-lg font-medium"
             >
-              Pack your bags (metaphorically). We'll see you at <span className="text-white font-bold">{event.title}</span>!
+              You’re all set for <span className="text-white font-bold">{event.title}</span>.
+              <br />
+              Event details and joining information are below.
             </motion.p>
           </div>
         </div>
@@ -191,7 +193,7 @@ export default function ConfirmationPage() {
               <div className="md:col-span-8 p-8 md:p-12 space-y-10 border-b md:border-b-0 md:border-r border-dashed border-zinc-800">
                 <div className="space-y-6">
                   <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-zinc-800 rounded-full text-[10px] font-black uppercase tracking-widest text-zinc-400">
-                    Admission Ticket
+                    Registration details
                   </div>
                   <h2 className="text-3xl font-black leading-tight tracking-tight">{event.title}</h2>
                 </div>
@@ -215,7 +217,7 @@ export default function ConfirmationPage() {
                     <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-wider">Location</p>
                     <p className="font-bold flex items-center gap-2">
                       {event.location_type === 'online' ? <Globe className="w-4 h-4 text-100x-accent-primary" /> : <MapPin className="w-4 h-4 text-100x-accent-primary" />}
-                      {event.location_type === 'online' ? 'Online Experience' : (event.city || 'In-Person Event')}
+                      {event.location_type === 'online' ? 'Online event' : (event.city || 'In-Person Event')}
                     </p>
                   </div>
                 </div>
@@ -227,7 +229,7 @@ export default function ConfirmationPage() {
                     animate={{ scale: 1 }}
                     className="p-6 bg-100x-accent-primary/10 border border-100x-accent-primary/20 rounded-3xl space-y-3"
                   >
-                    <p className="text-xs font-bold text-100x-accent-primary uppercase tracking-widest">Joining Credentials</p>
+                    <p className="text-xs font-bold text-100x-accent-primary uppercase tracking-widest">Joining link</p>
                     <a
                       href={event.meeting_link}
                       target="_blank"
@@ -249,7 +251,7 @@ export default function ConfirmationPage() {
                         <User className="w-5 h-5 text-zinc-400" />
                       </div>
                       <div className="space-y-0.5">
-                        <p className="text-[10px] font-bold text-zinc-600 uppercase">Passenger</p>
+                        <p className="text-[10px] font-bold text-zinc-600 uppercase">Attendee</p>
                         <p className="text-sm font-bold truncate max-w-[120px]">{registration.attendee_name}</p>
                       </div>
                     </div>
@@ -304,7 +306,7 @@ export default function ConfirmationPage() {
             variant="outline"
             className="flex-1 h-16 border-zinc-800 bg-zinc-900/50 text-zinc-400 hover:text-white hover:bg-zinc-900 font-bold text-lg rounded-2xl transition-all"
           >
-            Explore More
+            See more community events
           </Button>
         </div>
 
@@ -324,6 +326,11 @@ export default function ConfirmationPage() {
             Back to All Events
           </Button>
         </div>
+
+        {/* Small reassurance line */}
+        <p className="text-center text-xs text-zinc-600 font-medium">
+          You’ll also receive event updates on email or WhatsApp if required.
+        </p>
       </div>
 
       <style jsx global>{`

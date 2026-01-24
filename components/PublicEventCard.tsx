@@ -44,6 +44,8 @@ export function PublicEventCard({ event, className }: PublicEventCardProps) {
       >
         {/* Event Image */}
         <div className="relative aspect-[16/10] w-full overflow-hidden">
+          <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-black/50 backdrop-blur-md border border-white/10 rounded-full">
+          </div>
           <SafeImage
             src={event.event_image_url}
             alt={event.title}
@@ -55,11 +57,13 @@ export function PublicEventCard({ event, className }: PublicEventCardProps) {
           <div className="absolute top-4 right-4">
             <div className={cn(
               "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border backdrop-blur-md",
-              isFull
-                ? "bg-red-500/20 border-red-500/50 text-red-500"
-                : "bg-100x-accent-primary/20 border-100x-accent-primary/50 text-100x-accent-primary"
+              new Date(event.event_date) < new Date()
+                ? "bg-zinc-800/80 border-zinc-700 text-zinc-400"
+                : isFull
+                  ? "bg-red-500/20 border-red-500/50 text-red-500"
+                  : "bg-100x-accent-primary/20 border-100x-accent-primary/50 text-100x-accent-primary"
             )}>
-              {isFull ? "Sold Out" : "Open"}
+              {new Date(event.event_date) < new Date() ? "Closed" : isFull ? "Sold Out" : "RSVP open"}
             </div>
           </div>
 
@@ -75,6 +79,9 @@ export function PublicEventCard({ event, className }: PublicEventCardProps) {
             <h3 className="text-lg font-black text-white leading-tight line-clamp-1 group-hover:text-100x-accent-primary transition-colors italic">
               {event.title}
             </h3>
+            <p className="text-[9px] font-bold text-zinc-600 uppercase tracking-wider">
+              Hosted by a 100x community member
+            </p>
             <p className="text-[10px] font-medium text-zinc-500 line-clamp-2 leading-relaxed">
               {event.description}
             </p>
@@ -100,7 +107,7 @@ export function PublicEventCard({ event, className }: PublicEventCardProps) {
           {/* Footer Area */}
           <div className="pt-3 border-t border-zinc-800/50 flex items-center justify-between">
             <div className="space-y-0.5">
-              <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Attendance</span>
+              <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">RSVPs</span>
               <div className="flex items-baseline gap-1">
                 <span className="text-xs font-black text-white">{event.current_registrations}</span>
                 <span className="text-[9px] font-bold text-zinc-600">/ {event.max_capacity}</span>

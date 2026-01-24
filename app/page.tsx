@@ -71,14 +71,14 @@ export default function Home() {
             >
 
 
-              <h1 className="text-5xl md:text-7xl font-black leading-[0.9] tracking-tighter">
+              <h1 className="text-6xl md:text-6xl font-black leading-[0.9] tracking-tighter">
                 100x <br />
-                <span className="text-zinc-600">Engineers</span> <br />
-                <span className="text-100x-accent-primary">Events.</span>
+                <span className="text-100x-accent-primary">Community Events</span>
               </h1>
 
-              <p className="text-zinc-400 text-base md:text-lg max-w-md font-medium leading-relaxed">
-                Where high-performance engineers meet to share, build, and break things. Join the inner circle.
+              <p className="text-zinc-400 text-base md:text-1xl max-w-md font-medium leading-relaxed">
+                Everything happening in the 100x community, in one place.
+                Workshops, talks, jam sessions, and peer-led events by 100x alumni and members.
               </p>
 
               <div className="flex flex-wrap gap-4 pt-4">
@@ -86,17 +86,17 @@ export default function Home() {
                   onClick={() => document.getElementById('events-section')?.scrollIntoView({ behavior: 'smooth' })}
                   shimmerColor="#ffffff"
                   background="#FF6B35"
-                  className="h-14 px-8 text-black font-black text-lg rounded-2xl transition-all hover:scale-[1.05]"
+                  className="h-12 px-6 text-black font-black text-lg rounded-2xl transition-all hover:scale-[1.05]"
                 >
-                  Explore Events
+                  See what’s happening
                 </ShimmerButton>
                 <Link href="/login">
                   <ShimmerButton
                     shimmerColor="#ffffff"
                     background="#1a1a1a"
-                    className="h-14 px-8 border border-zinc-800 text-white font-black text-lg rounded-2xl hover:bg-zinc-900"
+                    className="h-12 px-5 border border-zinc-800 text-white font-black text-lg rounded-2xl hover:bg-zinc-900"
                   >
-                    Host an Event
+                    Host a community event
                   </ShimmerButton>
                 </Link>
               </div>
@@ -105,11 +105,11 @@ export default function Home() {
               <div className="flex gap-12 pt-8 border-t border-zinc-900">
                 <div>
                   <p className="text-3xl font-black">{upcomingEvents.length + pastEvents.length}</p>
-                  <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Total Events</p>
+                  <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Community events listed</p>
                 </div>
                 <div>
                   <p className="text-3xl font-black">500+</p>
-                  <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Engineers</p>
+                  <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Community members</p>
                 </div>
               </div>
             </motion.div>
@@ -130,12 +130,25 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Why this exists Section */}
+        <section className="container mx-auto px-4 py-16 border-t border-zinc-900/50">
+          <div className="max-w-2xl mx-auto space-y-6 text-center">
+            <h2 className="text-3xl font-black tracking-tight text-white">Why this exists</h2>
+            <div className="space-y-1 text-zinc-300 font-medium leading-relaxed">
+              A lot happens in the 100x community outside scheduled lectures.<br />
+              Sessions get planned and hosted by members, but often get lost across different places.
+              This space exists so community events are easy to find, easy to join, and easy to share with everyone who belongs here.
+            </div>
+            {/* Placeholder for FAQ */}
+          </div>
+        </section>
+
         {/* Events Section */}
         <section id="events-section" className="container mx-auto px-4 py-24 space-y-16">
           <div className="flex flex-col md:flex-row items-end justify-between gap-8">
             <div className="space-y-4">
               <h2 className="text-3xl md:text-4xl font-black tracking-tighter">
-                Discover the <span className="text-zinc-600 italic">Energy.</span>
+                What’s happening in the <span className="text-zinc-600 italic">100x community</span>
               </h2>
               <div className="flex gap-2">
                 <button
@@ -160,22 +173,27 @@ export default function Home() {
             </div>
 
             {/* Filters */}
-            <div className="flex flex-wrap gap-2">
-              <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest self-center mr-2">Filter By</span>
-              {(['all', 'online', 'offline', 'hybrid'] as const).map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setLocationFilter(type)}
-                  className={cn(
-                    "px-4 py-1.5 rounded-xl text-[10px] font-bold border transition-all",
-                    locationFilter === type
-                      ? "bg-100x-accent-primary/10 border-100x-accent-primary text-100x-accent-primary"
-                      : "bg-zinc-900 border-zinc-800 text-zinc-500 hover:border-zinc-700"
-                  )}
-                >
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </button>
-              ))}
+            <div className="flex flex-col items-end gap-2">
+              <p className="text-[10px] font-medium text-zinc-500 italic">
+                All community-led events show up here once approved.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest self-center mr-2">Filter By</span>
+                {(['all', 'online', 'offline', 'hybrid'] as const).map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setLocationFilter(type)}
+                    className={cn(
+                      "px-4 py-1.5 rounded-xl text-[10px] font-bold border transition-all",
+                      locationFilter === type
+                        ? "bg-100x-accent-primary/10 border-100x-accent-primary text-100x-accent-primary"
+                        : "bg-zinc-900 border-zinc-800 text-zinc-500 hover:border-zinc-700"
+                    )}
+                  >
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -230,18 +248,23 @@ export default function Home() {
 
           <div className="relative z-10 space-y-12">
             <h2 className="text-4xl md:text-6xl font-black tracking-tighter max-w-3xl mx-auto leading-none">
-              Ready to <span className="text-100x-accent-primary underline decoration-zinc-800 underline-offset-8">Spark</span> Something?
+              Host a <span className="text-100x-accent-primary underline decoration-zinc-800 underline-offset-8">community event</span>
             </h2>
-            <p className="text-zinc-400 text-base md:text-lg font-medium max-w-xl mx-auto leading-relaxed italic">
-              "An engineer is a person who can build with one dollar what any fool can build with two." - Let's build together.
-            </p>
+            <div className="space-y-2">
+              <p className="text-zinc-400 text-base md:text-lg font-medium max-w-xl mx-auto leading-relaxed">
+                Reach the full 100x community in one place.
+              </p>
+              <p className="text-zinc-400 text-base md:text-lg font-medium max-w-xl mx-auto leading-relaxed">
+                Alumni and current learners can find your event here.
+              </p>
+            </div>
             <Link href="/login" className="inline-block mt-8">
               <ShimmerButton
                 background="#ffffff"
                 shimmerColor="#FF6B35"
-                className="h-14 px-10 text-black font-black text-xl rounded-2xl group transition-all"
+                className="h-14 px-8 text-black font-black text-xl rounded-2xl group transition-all"
               >
-                Become a Host
+                Host a community event
                 <ArrowRight className="w-6 h-6 ml-3 transition-transform group-hover:translate-x-1" />
               </ShimmerButton>
             </Link>
@@ -262,6 +285,6 @@ export default function Home() {
           </p>
         </div>
       </footer>
-    </div>
+    </div >
   )
 }

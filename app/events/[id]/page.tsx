@@ -171,7 +171,7 @@ export default function EventDetailPage() {
             >
               <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
                 <div className="w-1.5 h-1.5 bg-100x-accent-primary rounded-full animate-pulse" />
-                <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">About Event</span>
+                <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">About the event</span>
               </div>
 
               <div className="space-y-8">
@@ -187,8 +187,8 @@ export default function EventDetailPage() {
                     <span className="text-black font-black text-sm">100x</span>
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Organized by</p>
-                    <p className="font-bold text-white">100xEngineers</p>
+                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Hosted by</p>
+                    <p className="font-bold text-white">100x community member</p>
                   </div>
                 </div>
 
@@ -303,10 +303,10 @@ export default function EventDetailPage() {
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <h3 className="text-2xl font-bold ">Take Your Seat</h3>
+                      <h3 className="text-2xl font-bold ">Register for the event</h3>
                       <Sparkles className="w-5 h-5 text-100x-accent-primary animate-pulse" />
                     </div>
-                    <p className="text-zinc-500 font-medium">Limited slots available. Beat the queue, secure your spot now!</p>
+                    <p className="text-zinc-500 font-medium">Register to attend. Event details will be shared after registration.</p>
                   </div>
                   <RegistrationForm eventId={eventId} eventTitle={event.title} />
                 </div>

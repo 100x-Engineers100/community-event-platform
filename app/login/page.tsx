@@ -50,11 +50,12 @@ function LoginForm() {
                 <span className="text-black font-black text-2xl tracking-tighter">100x</span>
               </motion.div>
               <h1 className="text-3xl font-black tracking-tight text-white mb-2">
-                The Portal to <span className="text-100x-accent-primary">Events</span>
+                Host a <span className="text-100x-accent-primary">community event</span>
               </h1>
-              <p className="text-zinc-500 font-medium text-sm max-w-[240px] mx-auto">
-                Where engineers meet, chaos ensues, and code actually works. Probably.
-              </p>
+              <div className="text-zinc-500 font-medium text-sm max-w-[280px] mx-auto space-y-1">
+                Create and share events with the 100x community.
+                Events submitted here are reviewed before being published.
+              </div>
             </div>
           </div>
 
@@ -105,8 +106,9 @@ function LoginForm() {
               <span className="text-[10px] font-black uppercase tracking-[0.3em]">The Boring Legal Bit</span>
               <div className="h-px w-8 bg-zinc-800" />
             </div>
-            <p className="text-[10px] text-center text-zinc-600 font-medium">
-              By joining, you agree to treat everyone with respect and maybe share your snacks. Also our regular Terms apply.
+            <p className="text-[12px] text-center text-zinc-600 font-medium">
+              By continuing, you confirm that you are part of the 100x community.
+              We use this to verify hosts before publishing events.
             </p>
           </div>
         </div>
