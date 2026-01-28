@@ -108,10 +108,7 @@ export default function Home() {
                   <p className="text-3xl font-black">{upcomingEvents.length + pastEvents.length}</p>
                   <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Community events listed</p>
                 </div>
-                <div>
-                  <p className="text-3xl font-black">500+</p>
-                  <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Community members</p>
-                </div>
+
               </div>
             </motion.div>
 
@@ -133,10 +130,10 @@ export default function Home() {
 
         {/* Why this exists Section */}
         <section className="container mx-auto px-4 py-16 border-t border-zinc-900/50">
-          <div className="max-w-2xl mx-auto space-y-6 text-center">
+          <div className="max-w-4xl mx-auto space-y-8 text-center">
             <h2 className="text-3xl font-black tracking-tight text-white">Why this exists</h2>
-            <div className="space-y-1 text-zinc-300 font-mono leading-relaxed">
-              A lot happens in the 100x community outside scheduled lectures.<br />
+            <div className="space-y-2 text-zinc-300 font-mono leading-relaxed">
+              A lot happens in the 100x community outside scheduled lectures.
               Sessions get planned and hosted by members, but often get lost across different places.
               This space exists so community events are easy to find, easy to join, and easy to share with everyone who belongs here.
             </div>
@@ -150,7 +147,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row items-end justify-between gap-8">
             <div className="space-y-4">
               <h2 className="text-3xl md:text-4xl font-black tracking-tighter">
-                What’s happening in the <span className="text-zinc-600 italic">100x community</span>
+                What’s happening in the <span className="text-100x-accent-primary  italic">100x community</span>
               </h2>
               <div className="flex gap-2">
                 <button
@@ -278,33 +275,57 @@ export default function Home() {
             <h3 className="text-2xl font-black text-white mb-8 font-mono tracking-tight text-center">Frequently asked questions</h3>
             <AccordionRoot>
               <AccordionItemV2 value="item-1">
-                <AccordionTriggerV2>How many events can I host per day?</AccordionTriggerV2>
+                <AccordionTriggerV2>Who can host events on this platform?</AccordionTriggerV2>
                 <AccordionContentV2>
-                  You can submit up to 3 events per day. This limit resets at midnight server time. If you've reached your daily limit, you'll need to wait until the next day to submit more events.
+                  Events can be hosted by the 100x team, alumni, and current cohort members. Community-hosted events are reviewed before being published.
                 </AccordionContentV2>
               </AccordionItemV2>
               <AccordionItemV2 value="item-2">
-                <AccordionTriggerV2>Can I edit my event after submitting it?</AccordionTriggerV2>
+                <AccordionTriggerV2>Can events on this platform be paid?</AccordionTriggerV2>
                 <AccordionContentV2>
-                  No, events cannot be edited after submission. Once submitted, your event enters the review queue. If you need changes, you'll need to contact an admin or wait for it to be reviewed/rejected, then resubmit with corrections.
+                  Events hosted by the 100x team may be paid. Community-hosted events must be free and are meant for learning and sharing.
                 </AccordionContentV2>
               </AccordionItemV2>
               <AccordionItemV2 value="item-3">
-                <AccordionTriggerV2>What happens if my event isn't reviewed in time?</AccordionTriggerV2>
+                <AccordionTriggerV2>How many events can I host per day?</AccordionTriggerV2>
                 <AccordionContentV2>
-                  Events that aren't reviewed within 7 days automatically expire. You'll see an "Expired" banner on your dashboard and can resubmit the event with the same or updated details.
+                  You can submit up to 3 events per day. This limit resets at midnight server time.
                 </AccordionContentV2>
               </AccordionItemV2>
               <AccordionItemV2 value="item-4">
-                <AccordionTriggerV2>When will I see the meeting link for an event?</AccordionTriggerV2>
+                <AccordionTriggerV2>Are events reviewed before being published?</AccordionTriggerV2>
                 <AccordionContentV2>
-                  Meeting links are only visible after you successfully register for an event. They're not shown on the public event page to protect privacy and prevent unauthorized access.
+                  Yes. All community-hosted events are reviewed before they are published to the platform.
                 </AccordionContentV2>
               </AccordionItemV2>
               <AccordionItemV2 value="item-5">
-                <AccordionTriggerV2>Can I register for an event that's already full?</AccordionTriggerV2>
+                <AccordionTriggerV2>Can I edit my event after submitting it?</AccordionTriggerV2>
                 <AccordionContentV2>
-                  No, once an event reaches maximum capacity, registration closes. The event page will show a "Full" badge. Check back later as the organizers may increase capacity or consider attending future events.
+                  Once an event is submitted, it cannot be edited while it is under review. You can resubmit the event with updates after the review is completed.
+                </AccordionContentV2>
+              </AccordionItemV2>
+              <AccordionItemV2 value="item-6">
+                <AccordionTriggerV2>What happens if my event is not reviewed in time?</AccordionTriggerV2>
+                <AccordionContentV2>
+                  If an event is not reviewed within 7 days, it will expire automatically. You will see the expired status in your dashboard and can resubmit the event with the same or updated details.
+                </AccordionContentV2>
+              </AccordionItemV2>
+              <AccordionItemV2 value="item-7">
+                <AccordionTriggerV2>When will I see the meeting link for an event?</AccordionTriggerV2>
+                <AccordionContentV2>
+                  The meeting link is shared after you successfully register for an event. It is not shown on the public event page.
+                </AccordionContentV2>
+              </AccordionItemV2>
+              <AccordionItemV2 value="item-8">
+                <AccordionTriggerV2>Can I register for an event that is already full?</AccordionTriggerV2>
+                <AccordionContentV2>
+                  No. Once an event reaches its maximum capacity, registrations close and the event is marked as full. You can check back later in case capacity is increased or explore other upcoming events.
+                </AccordionContentV2>
+              </AccordionItemV2>
+              <AccordionItemV2 value="item-9">
+                <AccordionTriggerV2>Can I host offline or in-person events?</AccordionTriggerV2>
+                <AccordionContentV2>
+                  Yes. Events can be online, offline, or hybrid. The event details should clearly mention the format and location.
                 </AccordionContentV2>
               </AccordionItemV2>
             </AccordionRoot>

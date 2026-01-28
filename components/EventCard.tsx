@@ -121,7 +121,7 @@ export function EventCard({ event, className }: EventCardProps) {
             </div>
           ) : (
             <div className="text-[10px] font-bold text-zinc-600 italic">
-              Awaiting review from the high council...
+              Under review by the 100x team
             </div>
           )}
         </div>

@@ -1,10 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Calendar, Clock, Globe } from 'lucide-react'
+import { Calendar as CalendarIcon, Clock, Globe } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { format, parse, isValid } from 'date-fns'
+import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { format, isValid, parseISO } from 'date-fns'
 import { cn } from '@/lib/utils'
 
 interface DateTimePickerProps {
@@ -20,16 +23,16 @@ export function DateTimePicker({
     error,
     className
 }: DateTimePickerProps) {
-    const [datePart, setDatePart] = useState('')
-    const [timePart, setTimePart] = useState('19:00') // Default to 7 PM
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
+    const [timePart, setTimePart] = useState('19:00')
 
     // Initialize from value
     useEffect(() => {
         if (value) {
             try {
-                const date = new Date(value)
+                const date = parseISO(value)
                 if (isValid(date)) {
-                    setDatePart(format(date, 'yyyy-MM-dd'))
+                    setSelectedDate(date)
                     setTimePart(format(date, 'HH:mm'))
                 }
             } catch (e) {
@@ -38,77 +41,94 @@ export function DateTimePicker({
         }
     }, [value])
 
-    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newDate = e.target.value
-        setDatePart(newDate)
-        updateValue(newDate, timePart)
+    const handleDateSelect = (date: Date | undefined) => {
+        if (date) {
+            setSelectedDate(date)
+            updateValue(date, timePart)
+        }
     }
 
     const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newTime = e.target.value
         setTimePart(newTime)
-        updateValue(datePart, newTime)
-    }
-
-    const updateValue = (d: string, t: string) => {
-        if (d && t) {
-            try {
-                const combined = `${d}T${t}:00`
-                const date = new Date(combined)
-                if (isValid(date)) {
-                    onChange(date.toISOString())
-                }
-            } catch (e) {
-                console.error('Error combining date and time')
-            }
+        if (selectedDate) {
+            updateValue(selectedDate, newTime)
         }
     }
 
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    const timezoneOffset = format(new Date(), 'xxx')
+    const updateValue = (date: Date, time: string) => {
+        try {
+            const [hours, minutes] = time.split(':').map(Number)
+            const newDate = new Date(date)
+            newDate.setHours(hours)
+            newDate.setMinutes(minutes)
+            newDate.setSeconds(0)
+            newDate.setMilliseconds(0)
+
+            if (isValid(newDate)) {
+                onChange(newDate.toISOString())
+            }
+        } catch (e) {
+            console.error('Error updating date value')
+        }
+    }
 
     return (
         <div className={cn("space-y-4", className)}>
             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <Label className="text-100x-text-secondary text-xs uppercase tracking-wider font-semibold">
+                <div className="space-y-2 flex flex-col">
+                    <Label className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">
                         Date
                     </Label>
-                    <div className="relative">
-                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-100x-text-muted" />
-                        <Input
-                            type="date"
-                            value={datePart}
-                            onChange={handleDateChange}
-                            min={format(new Date(), 'yyyy-MM-dd')}
-                            className="pl-10 bg-100x-bg-secondary border-100x-border-default text-100x-text-primary focus:ring-100x-accent-primary"
-                        />
-                    </div>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "h-12 w-full justify-start text-left font-normal bg-zinc-900 border-zinc-800 hover:bg-zinc-800/50 hover:border-100x-accent-primary group transition-all rounded-md px-3",
+                                    !selectedDate && "text-zinc-500"
+                                )}
+                            >
+                                <CalendarIcon className="mr-2 h-4 w-4 text-zinc-500 group-hover:text-100x-accent-primary transition-colors" />
+                                {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0 bg-zinc-950 border-zinc-800" align="start">
+                            <Calendar
+                                mode="single"
+                                selected={selectedDate}
+                                onSelect={handleDateSelect}
+                                disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                                initialFocus
+                                className="bg-transparent"
+                            />
+                        </PopoverContent>
+                    </Popover>
                 </div>
 
                 <div className="space-y-2">
-                    <Label className="text-100x-text-secondary text-xs uppercase tracking-wider font-semibold">
+                    <Label className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">
                         Time
                     </Label>
                     <div className="relative">
-                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-100x-text-muted" />
+                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                         <Input
                             type="time"
                             value={timePart}
                             onChange={handleTimeChange}
-                            className="pl-10 bg-100x-bg-secondary border-100x-border-default text-100x-text-primary focus:ring-100x-accent-primary"
+                            className="pl-10 h-12 bg-zinc-900 border-zinc-800 focus:border-100x-accent-primary text-white"
                         />
                     </div>
                 </div>
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-100x-text-muted">
-                <Globe className="w-3.5 h-3.5" />
-                <span>GMT{timezoneOffset} {timezone.replace('_', ' ')}</span>
+            <div className="flex items-center gap-2 text-[10px] font-bold text-zinc-600 uppercase tracking-widest">
+                <Globe className="w-3 h-3" />
+                <span>Time shown in IST (Asia/Calcutta)</span>
             </div>
 
             {error && (
-                <p className="text-red-400 text-sm mt-1">{error}</p>
+                <p className="text-red-400 text-xs font-medium mt-1">{error}</p>
             )}
         </div>
     )

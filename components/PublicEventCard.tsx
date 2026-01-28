@@ -80,7 +80,7 @@ export function PublicEventCard({ event, className }: PublicEventCardProps) {
               {event.title}
             </h3>
             <p className="text-[9px] font-bold text-zinc-600 uppercase tracking-wider">
-              Hosted by a 100x community member
+              {event.host?.is_admin ? "Hosted by 100x" : "Hosted by 100x community member"}
             </p>
             <p className="text-[10px] font-medium text-zinc-500 line-clamp-2 leading-relaxed">
               {event.description}

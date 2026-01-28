@@ -29,6 +29,14 @@ export default function CreateEventPage() {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   const [userId, setUserId] = useState<string | null>(null)
 
+  // Randomized default images
+  const defaultImages = [
+    '/images/1.png',
+    '/images/2.png',
+    '/images/3.png',
+    '/images/default-event-image.png'
+  ]
+
   const {
     register,
     handleSubmit,
@@ -40,7 +48,7 @@ export default function CreateEventPage() {
     defaultValues: {
       location_type: 'online',
       max_capacity: 50,
-      event_image_url: '/images/default-event-image.png'
+      event_image_url: defaultImages[Math.floor(Math.random() * defaultImages.length)]
     }
   })
 
@@ -114,10 +122,10 @@ export default function CreateEventPage() {
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            Create an <span className="text-100x-accent-primary">Event</span>
+            Create a community <span className="text-100x-accent-primary">event</span>
           </h1>
           <p className="text-zinc-400 text-lg max-w-2xl">
-            Fill in the details below to submit your event for review.
+            Submit the details below. Events are reviewed before being published.
           </p>
         </div>
 
@@ -137,7 +145,7 @@ export default function CreateEventPage() {
           <div className="lg:col-span-5 lg:sticky lg:top-8">
             <div className="space-y-4">
               <Label className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">
-                Event Cover
+                Upload an event cover image
               </Label>
               <ImageUpload
                 userId={userId!}
@@ -148,7 +156,7 @@ export default function CreateEventPage() {
               <div className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800 flex gap-3 items-start">
                 <Info className="w-4 h-4 text-100x-accent-primary mt-0.5" />
                 <p className="text-xs text-zinc-500 leading-relaxed">
-                  Recommended size: 640x640px. This image will be shown on the event card and details page.
+                  Square image recommended (640x640px). This image will be shown on the event listing and event page.
                 </p>
               </div>
             </div>
@@ -160,7 +168,7 @@ export default function CreateEventPage() {
             <div className="space-y-8">
               <div className="space-y-2 border-b border-zinc-900 pb-4">
                 <h2 className="text-xl font-semibold">General Information</h2>
-                <p className="text-sm text-zinc-500">The core details of your event.</p>
+                <p className="text-sm text-zinc-500">Basic information about your event.</p>
               </div>
 
               <div className="space-y-6">
@@ -171,7 +179,7 @@ export default function CreateEventPage() {
                   <Input
                     id="title"
                     {...register('title')}
-                    placeholder="E.g., Mumbai React Meetup"
+                    placeholder="Example: Intro to AI agents"
                     className="h-12 bg-zinc-900 border-zinc-800 focus:border-100x-accent-primary text-lg"
                   />
                   {errors.title && (
@@ -186,19 +194,24 @@ export default function CreateEventPage() {
                   <Textarea
                     id="description"
                     {...register('description')}
-                    placeholder="Tell us what this event is about..."
+                    placeholder="Describe what the session is about, who it is for, and what attendees can expect."
                     className="min-h-[160px] bg-zinc-900 border-zinc-800 focus:border-100x-accent-primary resize-none text-base p-4"
                   />
-                  <div className="flex justify-between items-center px-1">
-                    <p className={cn(
-                      "text-[10px] font-medium uppercase tracking-tighter",
-                      description.length < 50 || description.length > 1000 ? "text-red-400" : "text-zinc-500"
-                    )}>
-                      {description.length} / 1000 Characters
+                  <div className="flex flex-col gap-1 px-1">
+                    <div className="flex justify-between items-center">
+                      <p className={cn(
+                        "text-[10px] font-medium uppercase tracking-tighter",
+                        description.length < 50 || description.length > 1000 ? "text-red-400" : "text-zinc-500"
+                      )}>
+                        {description.length} / 1000 characters
+                      </p>
+                      {errors.description && (
+                        <p className="text-red-400 text-xs font-medium">{errors.description.message}</p>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
+                      This helps community members understand what the session is about.
                     </p>
-                    {errors.description && (
-                      <p className="text-red-400 text-xs font-medium">{errors.description.message}</p>
-                    )}
                   </div>
                 </div>
 
@@ -215,7 +228,7 @@ export default function CreateEventPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="max_capacity" className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">
-                    Max Capacity
+                    Maximum attendees
                   </Label>
                   <Input
                     id="max_capacity"
@@ -226,6 +239,9 @@ export default function CreateEventPage() {
                   {errors.max_capacity && (
                     <p className="text-red-400 text-xs font-medium mt-1">{errors.max_capacity.message}</p>
                   )}
+                  <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
+                    You can cap registrations if needed.
+                  </p>
                 </div>
               </div>
             </div>
@@ -250,9 +266,9 @@ export default function CreateEventPage() {
                       <SelectValue placeholder="Select location type" />
                     </SelectTrigger>
                     <SelectContent className="bg-zinc-900 border-zinc-800">
-                      <SelectItem value="online">Online Event</SelectItem>
-                      <SelectItem value="offline">In-Person (Offline)</SelectItem>
-                      <SelectItem value="hybrid">Hybrid (Both)</SelectItem>
+                      <SelectItem value="online">Online</SelectItem>
+                      <SelectItem value="offline">Offline</SelectItem>
+                      <SelectItem value="hybrid">Hybrid</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -273,12 +289,15 @@ export default function CreateEventPage() {
                       <Input
                         id="meeting_link"
                         {...register('meeting_link')}
-                        placeholder="https://zoom.us/j/..."
+                        placeholder="Paste the joining link for your event"
                         className="h-12 bg-zinc-900 border-zinc-800 focus:border-100x-accent-primary"
                       />
                       {errors.meeting_link && (
                         <p className="text-red-400 text-xs font-medium mt-1">{errors.meeting_link.message}</p>
                       )}
+                      <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
+                        This will be shared with registered attendees.
+                      </p>
                     </motion.div>
                   )}
 
@@ -305,22 +324,29 @@ export default function CreateEventPage() {
                           <p className="text-red-400 text-xs font-medium mt-1">{errors.city.message}</p>
                         )}
                       </div>
+                    </motion.div>
+                  )}
 
-                      {locationType === 'offline' && (
-                        <div className="space-y-2">
-                          <Label htmlFor="venue_address" className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">
-                            Venue Address
-                          </Label>
-                          <Textarea
-                            id="venue_address"
-                            {...register('venue_address')}
-                            placeholder="Exact venue location details..."
-                            className="bg-zinc-900 border-zinc-800 focus:border-100x-accent-primary min-h-[100px]"
-                          />
-                          {errors.venue_address && (
-                            <p className="text-red-400 text-xs font-medium mt-1">{errors.venue_address.message}</p>
-                          )}
-                        </div>
+                  {/* offline/hybrid venue address */}
+                  {(locationType === 'offline' || locationType === 'hybrid') && (
+                    <motion.div
+                      key="offline-address"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden space-y-2 pt-2"
+                    >
+                      <Label htmlFor="venue_address" className="text-zinc-400 text-xs uppercase tracking-wider font-semibold">
+                        Venue Address
+                      </Label>
+                      <Textarea
+                        id="venue_address"
+                        {...register('venue_address')}
+                        placeholder="Exact venue location details..."
+                        className="bg-zinc-900 border-zinc-800 focus:border-100x-accent-primary min-h-[100px]"
+                      />
+                      {errors.venue_address && (
+                        <p className="text-red-400 text-xs font-medium mt-1">{errors.venue_address.message}</p>
                       )}
                     </motion.div>
                   )}
@@ -340,10 +366,10 @@ export default function CreateEventPage() {
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Creating...</span>
+                    <span>Submitting...</span>
                   </div>
                 ) : (
-                  "Create Event"
+                  "Submit for review"
                 )}
               </ShimmerButton>
               <Link href="/dashboard" className="sm:w-32">
@@ -356,6 +382,9 @@ export default function CreateEventPage() {
                 </Button>
               </Link>
             </div>
+            <p className="text-xs text-zinc-500 italic text-center w-full">
+              You can track the status of your event from your dashboard.
+            </p>
           </div>
         </form>
       </div>

@@ -9,7 +9,8 @@ import { Card } from '@/components/ui/card'
 import { useSearchParams } from 'next/navigation'
 import { Spotlight } from "@/components/ui/spotlight"
 import { motion } from 'framer-motion'
-import { LogIn, Sparkles } from 'lucide-react'
+import { LogIn, Sparkles, ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 
 function LoginForm() {
   const supabase = createClient()
@@ -52,8 +53,8 @@ function LoginForm() {
               <h1 className="text-3xl font-black tracking-tight text-white mb-2">
                 Host a <span className="text-100x-accent-primary">community event</span>
               </h1>
-              <div className="text-zinc-500 font-medium text-sm max-w-[280px] mx-auto space-y-1">
-                Create and share events with the 100x community.
+              <div className="text-zinc-500 font-medium text-xs max-w-[300px] mx-auto space-y-1">
+                Create and share events with the 100x community.<br />
                 Events submitted here are reviewed before being published.
               </div>
             </div>
@@ -101,15 +102,12 @@ function LoginForm() {
           </div>
 
           <div className="pt-4 flex flex-col items-center gap-6">
-            <div className="flex items-center gap-4 text-zinc-700">
-              <div className="h-px w-8 bg-zinc-800" />
-              <span className="text-[10px] font-black uppercase tracking-[0.3em]">The Boring Legal Bit</span>
-              <div className="h-px w-8 bg-zinc-800" />
+            <div className="pt-4 border-t border-zinc-900">
+              <p className="text-[12px] text-center text-zinc-600 font-medium pt-4">
+                By continuing, you confirm that you are part of the 100x community.
+                We use this to verify hosts before publishing events.
+              </p>
             </div>
-            <p className="text-[12px] text-center text-zinc-600 font-medium">
-              By continuing, you confirm that you are part of the 100x community.
-              We use this to verify hosts before publishing events.
-            </p>
           </div>
         </div>
       </Card>
@@ -126,6 +124,19 @@ export default function LoginPage() {
         fill="white"
       />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-100x-accent-primary/5 blur-[120px] rounded-full pointer-events-none" />
+
+      {/* Navigation */}
+      <nav className="absolute top-0 left-0 right-0 p-6 pointer-events-none">
+        <div className="max-w-7xl mx-auto flex items-center justify-between pointer-events-auto">
+          <Link
+            href="/"
+            className="h-10 px-4 backdrop-blur-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-full transition-all group flex items-center"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+            Home
+          </Link>
+        </div>
+      </nav>
 
       {/* Animated Elements */}
       <motion.div

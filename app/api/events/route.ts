@@ -25,7 +25,8 @@ export async function GET(request: Request) {
         max_capacity,
         current_registrations,
         status,
-        created_at
+        created_at,
+        host:profiles!host_id(is_admin)
       `)
       .in('status', ['published', 'completed'])
 
@@ -56,8 +57,13 @@ export async function GET(request: Request) {
     // IMPORTANT: meeting_link is excluded from SELECT to maintain privacy
     // Only registered users see meeting links
 
+    const formattedEvents = (events || []).map((e: any) => ({
+      ...e,
+      host: Array.isArray(e.host) ? e.host[0] : e.host
+    }))
+
     return NextResponse.json({
-      events: events as Event[],
+      events: formattedEvents as unknown as Event[],
       type,
       location_type: locationType
     })

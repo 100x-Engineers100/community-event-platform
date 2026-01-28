@@ -38,7 +38,7 @@ USING (auth.uid() = id);
 CREATE POLICY "Published events are public or own events"
 ON events FOR SELECT
 USING (
-  status = 'published'
+  status IN ('published', 'completed')
   OR host_id = auth.uid()
   OR EXISTS (
     SELECT 1 FROM profiles

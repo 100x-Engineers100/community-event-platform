@@ -42,6 +42,9 @@ export interface Event {
   reviewed_by: string | null
   expires_at: string
   event_image_url: string
+  host?: {
+    is_admin: boolean
+  }
 }
 
 export interface Registration {

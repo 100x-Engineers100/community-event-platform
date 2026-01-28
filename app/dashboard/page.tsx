@@ -90,11 +90,11 @@ export default async function DashboardPage() {
                     Host Portal
                   </div>
                   <h1 className="text-5xl md:text-7xl font-black text-white leading-tight tracking-tight">
-                    Your <span className="text-100x-accent-primary italic">Empire.</span>
+                    Your <span className="text-100x-accent-primary italic">events</span>
                   </h1>
                 </div>
                 <p className="text-zinc-400 font-medium text-lg max-w-md leading-relaxed">
-                  Manage your events, track registrations, and grow your community of legendary 100x Engineers.
+                  Create and manage events for the 100x community.
                 </p>
 
                 <div className="pt-4 flex flex-wrap gap-4">
@@ -105,8 +105,7 @@ export default async function DashboardPage() {
                       background="#FF6B35"
                       className="h-12 px-5 text-black font-black text-lg rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-100x-accent-primary/20 disabled:opacity-50"
                     >
-                      <Plus className="w-5 h-5 mr-2" />
-                      Create Event
+                      + Create a community event
                     </ShimmerButton>
                   </Link>
                 </div>
@@ -120,11 +119,11 @@ export default async function DashboardPage() {
           {/* Submission Power Bar */}
           <Card className="md:col-span-2 p-8 bg-zinc-900/50 border-zinc-800 rounded-[32px] flex items-center justify-between gap-8 overflow-hidden group">
             <div className="space-y-2 relative z-10">
-              <h3 className="text-xs font-black text-zinc-600 uppercase tracking-widest">Submission Power</h3>
+              <h3 className="text-xs font-black text-zinc-600 uppercase tracking-widest">Event submissions</h3>
               <div className="flex items-baseline gap-2">
                 <span className="text-4xl font-black text-white">{currentCount}</span>
-                <span className="text-xl font-bold text-zinc-700">/ {maxLimit}</span>
-                <span className="text-xs font-medium text-zinc-500 ml-2">left for today</span>
+                <span className="text-xl font-bold text-zinc-700">of {maxLimit}</span>
+                <span className="text-xs font-medium text-zinc-500 ml-2">available today</span>
               </div>
             </div>
 
@@ -135,9 +134,6 @@ export default async function DashboardPage() {
                   style={{ width: `${(currentCount / maxLimit) * 100}%` }}
                 />
               </div>
-              <p className="text-[10px] font-bold text-zinc-500 text-right uppercase tracking-wider">
-                {!canSubmit ? "Limit reached! Rest up, champ." : "You've got ideas. We've got slots."}
-              </p>
             </div>
           </Card>
 
@@ -148,7 +144,7 @@ export default async function DashboardPage() {
 
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full bg-100x-accent-primary animate-pulse shadow-[0_0_8px_rgba(255,107,53,1)]" />
-              <h3 className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Live Impact</h3>
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Total registrations</h3>
             </div>
 
             <div className="flex items-baseline gap-1">
@@ -158,7 +154,7 @@ export default async function DashboardPage() {
             </div>
 
             <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-600 group-hover:text-zinc-400 transition-colors flex items-center gap-2">
-              Engineers reached!!
+              registrations so far
             </p>
           </Card>
         </div>
@@ -181,7 +177,7 @@ export default async function DashboardPage() {
         <section className="space-y-8">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
-              Your Creations
+              Your events
               <span className="text-zinc-800 text-lg">/</span>
               <span className="text-zinc-600 font-bold text-lg">{events.length}</span>
             </h2>

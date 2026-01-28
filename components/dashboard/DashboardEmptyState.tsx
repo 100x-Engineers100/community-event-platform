@@ -19,22 +19,29 @@ export function DashboardEmptyState({ canSubmit }: DashboardEmptyStateProps) {
             >
                 <Ghost className="w-12 h-12 text-zinc-700" />
             </motion.div>
-            <div className="space-y-2">
-                <h2 className="text-3xl font-black text-white">
-                    Silent as a <span className="text-zinc-600 underline decoration-zinc-800">Production Crash.</span>
-                </h2>
-                <p className="text-zinc-500 font-medium max-w-xs mx-auto">
-                    You haven't created any events yet! Don't let your community wait in the dark.
-                </p>
+            <div className="space-y-4">
+                <div className="space-y-2">
+                    <h2 className="text-3xl font-black text-white">
+                        No events created yet
+                    </h2>
+                    <p className="text-zinc-500 font-medium max-w-sm mx-auto">
+                        Events you create will appear here. Submitted events may show as pending while they are under review.
+                    </p>
+                </div>
+                <div className="space-y-4">
+                    <Link href="/create-event">
+                        <Button
+                            disabled={!canSubmit}
+                            className="h-12 px-8 bg-white hover:bg-zinc-200 text-black font-black rounded-xl"
+                        >
+                            Create a community event
+                        </Button>
+                    </Link>
+                    <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
+                        Events are reviewed before being published to the community.
+                    </p>
+                </div>
             </div>
-            <Link href="/create-event">
-                <Button
-                    disabled={!canSubmit}
-                    className="h-12 px-8 bg-white hover:bg-zinc-200 text-black font-black rounded-xl"
-                >
-                    Start Your First Event
-                </Button>
-            </Link>
         </div>
     )
 }

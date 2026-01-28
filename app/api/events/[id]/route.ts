@@ -26,7 +26,8 @@ export async function GET(
         max_capacity,
         current_registrations,
         status,
-        created_at
+        created_at,
+        host:profiles!host_id(is_admin)
       `)
       .eq('id', id)
       .in('status', ['published', 'completed'])
@@ -42,7 +43,12 @@ export async function GET(
     // IMPORTANT: meeting_link is NOT included in SELECT
     // It will be revealed after registration in Stage 5
 
-    return NextResponse.json({ event: event as Event })
+    const formattedEvent = {
+      ...event,
+      host: Array.isArray(event.host) ? event.host[0] : event.host
+    }
+
+    return NextResponse.json({ event: formattedEvent as unknown as Event })
 
   } catch (error) {
     console.error('Unexpected error:', error)
