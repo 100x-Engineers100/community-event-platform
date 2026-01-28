@@ -105,7 +105,7 @@ export default async function DashboardPage() {
                       background="#FF6B35"
                       className="h-12 px-5 text-black font-black text-lg rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-100x-accent-primary/20 disabled:opacity-50"
                     >
-                      + Create a community event
+                      Create a community event
                     </ShimmerButton>
                   </Link>
                 </div>
