@@ -17,7 +17,8 @@ import {
   Loader2,
   AlertCircle,
   Share2,
-  Sparkles
+  Sparkles,
+  Check
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import RegistrationForm from '@/components/RegistrationForm'
@@ -33,6 +34,7 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<Event | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [shareSuccess, setShareSuccess] = useState(false)
 
   useEffect(() => {
     fetchEvent()
@@ -60,6 +62,27 @@ export default function EventDetailPage() {
       setError('Failed to load event. Please try again.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleShare = async () => {
+    const eventUrl = `${window.location.origin}/events/${eventId}`
+
+    try {
+      await navigator.clipboard.writeText(eventUrl)
+      setShareSuccess(true)
+      setTimeout(() => setShareSuccess(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy:', err)
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea')
+      textArea.value = eventUrl
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+      setShareSuccess(true)
+      setTimeout(() => setShareSuccess(false), 2000)
     }
   }
 
@@ -132,10 +155,37 @@ export default function EventDetailPage() {
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
-              className="w-10 h-10 p-0 backdrop-blur-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-full"
+              onClick={handleShare}
+              className="w-10 h-10 p-0 backdrop-blur-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-full transition-all relative group"
             >
-              <Share2 className="w-4 h-4" />
+              <Share2 className={cn(
+                "w-4 h-4 transition-all",
+                shareSuccess && "scale-0"
+              )} />
+              {shareSuccess && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  <Check className="w-4 h-4 text-100x-accent-primary" />
+                </motion.div>
+              )}
             </Button>
+
+            {/* Toast notification */}
+            <AnimatePresence>
+              {shareSuccess && (
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  className="absolute right-10 top-14 backdrop-blur-xl bg-100x-accent-primary/90 text-black px-4 py-2 rounded-full text-sm font-bold shadow-lg"
+                >
+                  Link copied!
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </nav>
@@ -173,6 +223,19 @@ export default function EventDetailPage() {
                 <div className="w-1.5 h-1.5 bg-100x-accent-primary rounded-full animate-pulse" />
                 <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">About the event</span>
               </div>
+
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 }}
+                className="flex items-center gap-3 text-100x-accent-primary"
+              >
+                <div className="h-px w-8 bg-100x-accent-primary/30" />
+                <p className="text-sm font-bold tracking-tight italic">
+                  Share the event to your folks so they can also register.
+                </p>
+                <div className="h-px w-8 bg-100x-accent-primary/30" />
+              </motion.div>
 
               <div className="space-y-8">
                 <div className="prose prose-invert max-w-none">

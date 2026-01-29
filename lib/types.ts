@@ -1,7 +1,7 @@
 export type Affiliation =
   | '100x Alumni'
   | 'Current Cohort'
-  | 'Friend of 100x'
+
   | 'Partner Community'
 
 export type LocationType = 'online' | 'offline' | 'hybrid'

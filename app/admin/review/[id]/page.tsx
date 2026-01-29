@@ -26,6 +26,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface Event {
   id: string;
+  host_id: string;
   title: string;
   description: string;
   event_date: string;
@@ -59,6 +60,14 @@ export default function EventReviewPage() {
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
 
+  // Cohort verification state
+  const [verificationData, setVerificationData] = useState<{
+    is_verified: boolean;
+    cohort: string | null;
+    matched_by: string | null;
+  } | null>(null);
+  const [verificationLoading, setVerificationLoading] = useState(false);
+
   useEffect(() => {
     const fetchEvent = async () => {
       if (!eventId) return;
@@ -82,6 +91,8 @@ export default function EventReviewPage() {
           setError('Event not found or already reviewed.');
         } else {
           setEvent(foundEvent);
+          // Fetch verification data for this host
+          fetchVerification(foundEvent.host_id);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
@@ -92,6 +103,33 @@ export default function EventReviewPage() {
 
     fetchEvent();
   }, [eventId, router]);
+
+  const fetchVerification = async (hostId: string) => {
+    try {
+      setVerificationLoading(true);
+      console.log('[VERIFY] Fetching verification for host:', hostId);
+
+      const verifyResponse = await fetch(`/api/admin/verify-host/${hostId}`);
+
+      console.log('[VERIFY] Response status:', verifyResponse.status);
+
+      if (verifyResponse.ok) {
+        const verifyData = await verifyResponse.json();
+        console.log('[VERIFY] Success:', verifyData);
+        setVerificationData(verifyData);
+      } else {
+        const errorText = await verifyResponse.text();
+        console.error('[VERIFY] API failed with status:', verifyResponse.status);
+        console.error('[VERIFY] Error response:', errorText);
+        setVerificationData({ is_verified: false, cohort: null, matched_by: null });
+      }
+    } catch (err) {
+      console.error('[VERIFY] Exception:', err);
+      setVerificationData({ is_verified: false, cohort: null, matched_by: null });
+    } finally {
+      setVerificationLoading(false);
+    }
+  };
 
   const handleApprove = async () => {
     try {
@@ -279,7 +317,34 @@ export default function EventReviewPage() {
             <InfoCard icon={User} title="Host Information">
               <InfoDetail label="Name" value={profiles.full_name} />
               <InfoDetail label="Email" value={profiles.email} />
-              <InfoDetail label="Affiliation" value={profiles.affiliation} />
+
+
+              {/* Cohort Verification Badge */}
+              <div className="pt-4 border-t border-100x-border-default">
+                <p className="text-xs text-100x-text-muted uppercase tracking-wider mb-2">Verification Status</p>
+                {verificationLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Hourglass className="w-4 h-4 animate-spin text-100x-text-muted" />
+                    <span className="text-sm text-100x-text-secondary">Checking...</span>
+                  </div>
+                ) : verificationData?.is_verified ? (
+                  <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-lg p-3">
+                    <Check className="w-5 h-5 text-green-500" />
+                    <div>
+                      <p className="font-bold text-green-400">{verificationData.cohort}</p>
+                      <p className="text-xs text-green-300/70">Verified 100x Member</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3">
+                    <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                    <div>
+                      <p className="font-bold text-yellow-400">Not Verified</p>
+                      <p className="text-xs text-yellow-300/70">Manual verification required</p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </InfoCard>
 
             <InfoCard icon={Hourglass} title="Submission Timeline">
