@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = await createClient();
 
@@ -25,7 +25,7 @@ export async function GET(
   }
 
   // Get host ID from params
-  const hostId = params.id;
+  const { id: hostId } = await params;
 
   console.log('[VERIFY-HOST] Checking host:', hostId);
 
