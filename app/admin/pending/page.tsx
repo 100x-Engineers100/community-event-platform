@@ -42,7 +42,6 @@ interface Event {
   profiles: {
     full_name: string;
     email: string;
-    affiliation: string;
   };
 }
 
@@ -217,7 +216,6 @@ export default function PendingEventsPage() {
                           <TableCell className="py-6">
                             <div className="space-y-0.5">
                               <p className="text-white text-sm font-bold">{event.profiles.full_name}</p>
-                              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">{event.profiles.affiliation || 'Member'}</p>
                             </div>
                           </TableCell>
                           <TableCell className="py-6 text-zinc-400">

@@ -66,8 +66,6 @@ export function Navigation({ user, showSignIn = true, actions }: NavigationProps
                 <>
                   <div className="text-sm text-100x-text-secondary">
                     <span className="text-100x-text-primary font-medium">{user.full_name}</span>
-                    <span className="mx-2">•</span>
-                    <span>{user.affiliation}</span>
                   </div>
                   <Button
                     variant="outline"
@@ -120,7 +118,6 @@ export function Navigation({ user, showSignIn = true, actions }: NavigationProps
               <div className="text-sm text-100x-text-secondary pb-4 border-b border-100x-border-default">
                 <div className="text-100x-text-primary font-medium">{user.full_name}</div>
                 <div className="text-xs mt-1">{user.email}</div>
-                <div className="text-xs mt-1">{user.affiliation}</div>
               </div>
 
               <Button

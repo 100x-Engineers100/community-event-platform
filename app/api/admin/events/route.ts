@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
       const hostIds = [...new Set(events.map(e => e.host_id))];
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('id, full_name, email, affiliation')
+        .select('id, full_name, email')
         .in('id', hostIds);
 
       // Map profiles to events

@@ -1,8 +1,3 @@
-export type Affiliation =
-  | '100x Alumni'
-  | 'Current Cohort'
-
-  | 'Partner Community'
 
 export type LocationType = 'online' | 'offline' | 'hybrid'
 
@@ -17,8 +12,8 @@ export interface Profile {
   id: string
   email: string
   full_name: string
-  affiliation: Affiliation
   is_admin: boolean
+  cohort: string | null
   created_at: string
 }
 
@@ -44,6 +39,7 @@ export interface Event {
   event_image_url: string
   host?: {
     is_admin: boolean
+    cohort: string | null
   }
 }
 

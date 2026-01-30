@@ -42,7 +42,6 @@ interface Event {
   profiles: {
     full_name: string;
     email: string;
-    affiliation: string;
   };
 }
 

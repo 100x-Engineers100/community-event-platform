@@ -147,7 +147,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row items-end justify-between gap-8">
             <div className="space-y-4">
               <h2 className="text-3xl md:text-4xl font-black tracking-tighter">
-                What’s happening in the <span className="text-100x-accent-primary  italic">100x community</span>
+                What’s happening in the <span className="text-100x-accent-primary ">100x community</span>
               </h2>
               <div className="flex gap-2">
                 <button

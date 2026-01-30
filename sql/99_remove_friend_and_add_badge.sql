@@ -1,9 +1,20 @@
--- =============================================
--- TRIGGER: Handle New User Signup
--- Description: Automatically creates a profile in public.profiles when a user signs up via auth.users
--- Execute this in Supabase SQL Editor to FIX THE LOGIN LOOP
--- =============================================
+-- Migration script to remove 'affiliation' concept and add 'cohort' column for 'Admin hosted' badge
 
+BEGIN;
+
+-- 1. Drop affiliation column if it exists (since user doesn't want it)
+ALTER TABLE public.profiles DROP COLUMN IF EXISTS affiliation CASCADE;
+
+-- 2. Add 'cohort' column to profiles table
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS cohort text;
+
+-- 3. Backfill cohort information from verified_members
+UPDATE public.profiles p
+SET cohort = vm.cohort
+FROM public.verified_members vm
+WHERE p.email = vm.email OR LOWER(p.full_name) = LOWER(vm.full_name);
+
+-- 4. Update the handle_new_user trigger function to include cohort syncing and exclude affiliation
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -19,7 +30,6 @@ BEGIN
   VALUES (
     NEW.id,
     NEW.email,
-    -- Try to get name from metadata, fallback to email part if missing
     COALESCE(
       NEW.raw_user_meta_data->>'full_name', 
       NEW.raw_user_meta_data->>'name', 
@@ -31,9 +41,4 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Create the trigger
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+COMMIT;

@@ -8,15 +8,9 @@
 CREATE TABLE profiles (
   id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email text NOT NULL,
-  full_name text NOT NULL,
-  affiliation text NOT NULL
-    CHECK(affiliation IN (
-      '100x Alumni',
-      'Current Cohort',
-      'Friend of 100x',
-      'Partner Community'
-    )),
-  is_admin boolean DEFAULT false,
+  full_name: text NOT NULL,
+  cohort: text,
+  is_admin: boolean DEFAULT false,
   created_at timestamp DEFAULT now()
 );
 

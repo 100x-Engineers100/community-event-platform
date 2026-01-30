@@ -26,7 +26,8 @@ export async function GET(request: Request) {
         current_registrations,
         status,
         created_at,
-        host:profiles!host_id(is_admin)
+        event_image_url,
+        host:profiles!host_id(is_admin, cohort)
       `)
       .in('status', ['published', 'completed'])
 

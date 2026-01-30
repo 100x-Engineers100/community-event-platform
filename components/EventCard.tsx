@@ -10,6 +10,7 @@ import { toZonedTime } from 'date-fns-tz'
 import { Calendar, MapPin, Users, Globe, Building2, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SafeImage } from './event/SafeImage'
+import { getEventDisplayImage } from '@/lib/utils/event-images'
 
 interface EventCardProps {
   event: Event
@@ -43,7 +44,7 @@ export function EventCard({ event, className }: EventCardProps) {
       {/* Event Image */}
       <div className="relative aspect-[16/10] w-full overflow-hidden">
         <SafeImage
-          src={event.event_image_url}
+          src={getEventDisplayImage(event.id, event.event_image_url)}
           alt={event.title}
           className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
         />

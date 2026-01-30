@@ -25,6 +25,7 @@ import RegistrationForm from '@/components/RegistrationForm'
 import { ShimmerButton } from '@/components/ui/shimmer-button'
 import { motion, AnimatePresence } from 'framer-motion'
 import { SafeImage } from '@/components/event/SafeImage'
+import { getEventDisplayImage } from '@/lib/utils/event-images'
 
 export default function EventDetailPage() {
   const params = useParams()
@@ -152,7 +153,20 @@ export default function EventDetailPage() {
             Back
           </Button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-6">
+            {/* Aesthetic Share Suggestion */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+
+            >
+
+              <span className="text-[11px] font-black uppercase tracking-wider text-zinc-400 group-hover/share-msg:text-white transition-colors">
+                share with <span className="text-100x-accent-primary">100x folks</span>
+              </span>
+            </motion.div>
+
             <Button
               variant="ghost"
               onClick={handleShare}
@@ -203,7 +217,7 @@ export default function EventDetailPage() {
               className="relative aspect-square w-full overflow-hidden rounded-[40px] shadow-2xl shadow-100x-accent-primary/10 border border-white/5"
             >
               <SafeImage
-                src={event.event_image_url}
+                src={getEventDisplayImage(event.id, event.event_image_url)}
                 alt={event.title}
                 fill
               />
@@ -224,18 +238,6 @@ export default function EventDetailPage() {
                 <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">About the event</span>
               </div>
 
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 }}
-                className="flex items-center gap-3 text-100x-accent-primary"
-              >
-                <div className="h-px w-8 bg-100x-accent-primary/30" />
-                <p className="text-sm font-bold tracking-tight italic">
-                  Share the event to your folks so they can also register.
-                </p>
-                <div className="h-px w-8 bg-100x-accent-primary/30" />
-              </motion.div>
 
               <div className="space-y-8">
                 <div className="prose prose-invert max-w-none">

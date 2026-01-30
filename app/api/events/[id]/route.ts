@@ -27,6 +27,7 @@ export async function GET(
         current_registrations,
         status,
         created_at,
+        event_image_url,
         host:profiles!host_id(is_admin)
       `)
       .eq('id', id)

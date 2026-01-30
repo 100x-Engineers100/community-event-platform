@@ -4,11 +4,12 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Event } from '@/lib/types'
 import { format } from 'date-fns'
 import { toZonedTime } from 'date-fns-tz'
-import { Calendar, MapPin, Users, Globe, Building2, Clock } from 'lucide-react'
+import { Calendar, MapPin, Users, Globe, Building2, Clock, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { SafeImage } from './event/SafeImage'
+import { getEventDisplayImage } from '@/lib/utils/event-images'
 
 interface PublicEventCardProps {
   event: Event
@@ -33,6 +34,8 @@ export function PublicEventCard({ event, className }: PublicEventCardProps) {
     100
   )
 
+  const displayImage = getEventDisplayImage(event.id, event.event_image_url)
+
   return (
     <Link href={`/events/${event.id}`} className="block group">
       <Card
@@ -44,10 +47,14 @@ export function PublicEventCard({ event, className }: PublicEventCardProps) {
       >
         {/* Event Image */}
         <div className="relative aspect-[16/10] w-full overflow-hidden">
-          <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-black/50 backdrop-blur-md border border-white/10 rounded-full">
-          </div>
+          {event.host?.cohort === 'Cohort Admin' && (
+            <div className="absolute top-4 left-4 z-20 px-3 py-1 bg-100x-accent-primary/20 backdrop-blur-md border border-100x-accent-primary/50 rounded-full flex items-center gap-1.5 shadow-[0_0_20px_rgba(255,107,53,0.3)] animation-pulse">
+              <Sparkles className="w-3 h-3 text-100x-accent-primary" />
+              <span className="text-[10px] font-black text-white uppercase tracking-wider">Admin hosted</span>
+            </div>
+          )}
           <SafeImage
-            src={event.event_image_url}
+            src={displayImage}
             alt={event.title}
             className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
           />
@@ -76,7 +83,7 @@ export function PublicEventCard({ event, className }: PublicEventCardProps) {
 
         <div className="p-4 md:p-5 space-y-3">
           <div className="space-y-1">
-            <h3 className="text-lg font-black text-white leading-tight line-clamp-1 group-hover:text-100x-accent-primary transition-colors italic">
+            <h3 className="text-lg font-black text-white leading-tight line-clamp-1 group-hover:text-100x-accent-primary transition-colors">
               {event.title}
             </h3>
             <p className="text-[9px] font-bold text-zinc-600 uppercase tracking-wider">

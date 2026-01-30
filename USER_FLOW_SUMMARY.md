@@ -17,7 +17,6 @@ Community event platform with 3 user types: **Hosts** (create events), **Joinees
 **Profile Information Required:**
 - Email (from Google)
 - Full Name
-- Affiliation: 100x Alumni | Current Cohort | Friend of 100x | Partner Community
 
 **Journey:**
 ```
