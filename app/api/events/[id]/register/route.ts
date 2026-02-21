@@ -53,7 +53,15 @@ export async function POST(
       );
     }
 
-    // [STEP 4] Validate event status (must be published)
+    // [STEP 4] Guard: paid events must go through payment flow
+    if (event.price > 0) {
+      return NextResponse.json(
+        { error: 'This event requires payment. Use the payment flow.' },
+        { status: 400 }
+      )
+    }
+
+    // [STEP 4b] Validate event status (must be published)
     if (event.status !== 'published') {
       return NextResponse.json(
         {

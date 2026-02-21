@@ -70,25 +70,36 @@ export async function POST(request: Request) {
 
     const eventData = validation.data
 
-    // Check daily submission limit
-    const { data: canSubmitData, error: canSubmitError } = await supabase.rpc(
-      'can_submit_event',
-      { user_id: user.id }
-    )
+    // Check if user is admin (admins skip daily limit)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single()
 
-    if (canSubmitError) {
-      console.error('Error checking submission limit:', canSubmitError)
-      return NextResponse.json(
-        { error: 'Failed to check submission limit' },
-        { status: 500 }
-      )
-    }
+    const isAdmin = profile?.is_admin === true
 
-    if (!canSubmitData) {
-      return NextResponse.json(
-        { error: 'Daily submission limit reached (3/day)' },
-        { status: 429 }
+    // Check daily submission limit (non-admins only)
+    if (!isAdmin) {
+      const { data: canSubmitData, error: canSubmitError } = await supabase.rpc(
+        'can_submit_event',
+        { user_id: user.id }
       )
+
+      if (canSubmitError) {
+        console.error('Error checking submission limit:', canSubmitError)
+        return NextResponse.json(
+          { error: 'Failed to check submission limit' },
+          { status: 500 }
+        )
+      }
+
+      if (!canSubmitData) {
+        return NextResponse.json(
+          { error: 'Daily submission limit reached (3/day)' },
+          { status: 429 }
+        )
+      }
     }
 
     // Check title uniqueness
@@ -119,6 +130,8 @@ export async function POST(request: Request) {
         venue_address: eventData.venue_address || null,
         max_capacity: eventData.max_capacity,
         event_image_url: eventData.event_image_url || '/images/default-event-image.png',
+        // Only admins can set a price
+        price: isAdmin ? (eventData.price || 0) : 0,
         status: 'submitted'
       })
       .select()

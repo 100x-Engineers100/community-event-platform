@@ -14,7 +14,11 @@
       "mcp__shadcn-ui-server__list_shadcn_components",
       "Bash(curl:*)",
       "Bash(tree:*)",
-      "Bash(timeout /t 5)"
+      "Bash(timeout /t 5)",
+      "WebFetch(domain:razorpay.com)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:hisalman.in)",
+      "WebFetch(domain:resend.com)"
     ]
   }
 }

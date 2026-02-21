@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import RegistrationForm from '@/components/RegistrationForm'
+import PaymentForm from '@/components/PaymentForm'
 import { ShimmerButton } from '@/components/ui/shimmer-button'
 import { motion, AnimatePresence } from 'framer-motion'
 import { SafeImage } from '@/components/event/SafeImage'
@@ -208,9 +209,8 @@ export default function EventDetailPage() {
       <main className="max-w-[1200px] mx-auto px-4 pt-24 pb-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
 
-          {/* Left Column: Image & Registration Form */}
-          <div className="lg:col-span-5 space-y-10">
-            {/* Event Image */}
+          {/* Left Column: Image only */}
+          <div className="lg:col-span-5">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -222,45 +222,6 @@ export default function EventDetailPage() {
                 fill
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-
-
-            </motion.div>
-
-            {/* About / Description (MOVED FROM RIGHT) */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="space-y-6"
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
-                <div className="w-1.5 h-1.5 bg-100x-accent-primary rounded-full animate-pulse" />
-                <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">About the event</span>
-              </div>
-
-
-              <div className="space-y-8">
-                <div className="prose prose-invert max-w-none">
-                  <p className="text-xl text-zinc-300 leading-relaxed whitespace-pre-wrap font-medium">
-                    {event.description}
-                  </p>
-                </div>
-
-                {/* Hosted By (Staged) */}
-                <div className="pt-8 border-t border-zinc-900 flex items-center gap-4">
-                  <div className="w-12 h-12 bg-100x-accent-primary rounded-2xl flex items-center justify-center">
-                    <span className="text-black font-black text-sm">100x</span>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Hosted by</p>
-                    <p className="font-bold text-white">100x community member</p>
-                  </div>
-                </div>
-
-                <p className="text-[10px] text-zinc-600 font-medium italic mt-8 border-l border-zinc-900 pl-4">
-                  * No production environments were harmed during the planning of this event.
-                </p>
-              </div>
             </motion.div>
           </div>
 
@@ -315,7 +276,11 @@ export default function EventDetailPage() {
                         {event.location_type === 'online' ? 'Virtual Event' : (event.city || 'In-Person')}
                       </p>
                       <p className="text-sm font-medium">
-                        {event.location_type === 'online' ? 'Joining link upon registration' : (event.venue_address || 'Address visible to registered guests')}
+                        {event.location_type === 'online'
+                          ? 'Joining link upon registration'
+                          : event.price > 0
+                            ? 'Exact venue shared in confirmation email after payment'
+                            : (event.venue_address || 'Address visible to registered guests')}
                       </p>
                     </div>
                   </div>
@@ -371,9 +336,17 @@ export default function EventDetailPage() {
                       <h3 className="text-2xl font-bold ">Register for the event</h3>
                       <Sparkles className="w-5 h-5 text-100x-accent-primary animate-pulse" />
                     </div>
-                    <p className="text-zinc-500 font-medium">Register to attend. Event details will be shared after registration.</p>
+                    <p className="text-zinc-500 font-medium">
+                      {event.price > 0
+                        ? `Paid event - Rs. ${(event.price / 100).toLocaleString('en-IN')}. Secure payment via Razorpay.`
+                        : 'Free event. Event details will be shared after registration.'}
+                    </p>
                   </div>
-                  <RegistrationForm eventId={eventId} eventTitle={event.title} />
+                  {event.price > 0 ? (
+                    <PaymentForm eventId={eventId} eventTitle={event.title} price={event.price} />
+                  ) : (
+                    <RegistrationForm eventId={eventId} eventTitle={event.title} />
+                  )}
                 </div>
               ) : (
                 <div className="p-8 rounded-[32px] bg-zinc-900/50 border border-zinc-800 text-center space-y-4 overflow-hidden relative group">
@@ -403,6 +376,40 @@ export default function EventDetailPage() {
           </div>
 
         </div>
+
+        {/* About Section — full width below the grid, never overlaps form */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mt-16 pt-16 border-t border-zinc-900 space-y-8 max-w-3xl"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">
+            <div className="w-1.5 h-1.5 bg-100x-accent-primary rounded-full animate-pulse" />
+            <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">About the event</span>
+          </div>
+
+          <div className="prose prose-invert max-w-none">
+            <p className="text-xl text-zinc-300 leading-relaxed whitespace-pre-wrap font-medium">
+              {event.description}
+            </p>
+          </div>
+
+          <div className="pt-8 border-t border-zinc-900 flex items-center gap-4">
+            <div className="w-12 h-12 bg-100x-accent-primary rounded-2xl flex items-center justify-center">
+              <span className="text-black font-black text-sm">100x</span>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Hosted by</p>
+              <p className="font-bold text-white">100x community member</p>
+            </div>
+          </div>
+
+          <p className="text-[10px] text-zinc-600 font-medium italic border-l border-zinc-900 pl-4">
+            * No production environments were harmed during the planning of this event.
+          </p>
+        </motion.div>
+
       </main>
 
       {/* Footer / Copyright */}

@@ -29,6 +29,7 @@ export interface Event {
   venue_address: string | null
   max_capacity: number
   current_registrations: number
+  price: number
   status: EventStatus
   rejection_reason: string | null
   created_at: string
@@ -50,6 +51,9 @@ export interface Registration {
   attendee_email: string
   whatsapp_number?: string
   registered_at: string
+  razorpay_order_id?: string | null
+  razorpay_payment_id?: string | null
+  payment_status: 'free' | 'pending' | 'paid' | 'failed'
 }
 
 export interface DailySubmission {

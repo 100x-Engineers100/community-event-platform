@@ -1,0 +1,142 @@
+
+❯ also teh about the evnt content now scateers behined the rsvp tile  make sure that the content stays in teh place . 
+
+● Read 1 file (ctrl+o to expand)
+
+● I see the structural problem. The about section is trapped inside the left column div — on mobile it gets sandwiched between the image and the event    
+  info, and on desktop the PaymentForm (taller than RegistrationForm) pushes content out of alignment.
+
+  Best fix: pull the about section out of the left column entirely and place it as a full-width row below the grid. Cleaner layout, better mobile UX (user
+   sees image → info → pay → then reads about).
+
+● Update(app\events\[id]\page.tsx)
+  ⎿  Added 2 lines, removed 42 lines
+      209        <main className="max-w-[1200px] mx-auto px-4 pt-24 pb-24">
+      210          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+      211
+      212 -          {/* Left Column: Image & Registration Form */}                                                                                       
+      213 -          <div className="lg:col-span-5 space-y-10">                                                                                           
+      214 -            {/* Event Image */}                                                                                                                
+      212 +          {/* Left Column: Image only */}                                                                                                      
+      213 +          <div className="lg:col-span-5">                                                                                                      
+      214              <motion.div
+      215                initial={{ opacity: 0, scale: 0.95 }}
+      216                animate={{ opacity: 1, scale: 1 }}
+     ...
+      222                  fill
+      223                />
+      224                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+      226 -                                                                                                                                               
+      227 -                                                                                                                                               
+      225              </motion.div>
+      229 -                                                                                                                                               
+      230 -            {/* About / Description (MOVED FROM RIGHT) */}                                                                                     
+      231 -            <motion.div                                                                                                                        
+      232 -              initial={{ opacity: 0, y: 20 }}                                                                                                  
+      233 -              animate={{ opacity: 1, y: 0 }}                                                                                                   
+      234 -              transition={{ delay: 0.3 }}                                                                                                      
+      235 -              className="space-y-6"                                                                                                            
+      236 -            >                                                                                                                                  
+      237 -              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">                     
+      238 -                <div className="w-1.5 h-1.5 bg-100x-accent-primary rounded-full animate-pulse" />                                              
+      239 -                <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">About the event</span>                             
+      240 -              </div>                                                                                                                           
+      241 -                                                                                                                                               
+      242 -                                                                                                                                               
+      243 -              <div className="space-y-8">                                                                                                      
+      244 -                <div className="prose prose-invert max-w-none">                                                                                
+      245 -                  <p className="text-xl text-zinc-300 leading-relaxed whitespace-pre-wrap font-medium">                                        
+      246 -                    {event.description}                                                                                                        
+      247 -                  </p>                                                                                                                         
+      248 -                </div>                                                                                                                         
+      249 -                                                                                                                                               
+      250 -                {/* Hosted By (Staged) */}                                                                                                     
+      251 -                <div className="pt-8 border-t border-zinc-900 flex items-center gap-4">                                                        
+      252 -                  <div className="w-12 h-12 bg-100x-accent-primary rounded-2xl flex items-center justify-center">                              
+      253 -                    <span className="text-black font-black text-sm">100x</span>                                                                
+      254 -                  </div>                                                                                                                       
+      255 -                  <div>                                                                                                                        
+      256 -                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Hosted by</p>                                      
+      257 -                    <p className="font-bold text-white">100x community member</p>                                                              
+      258 -                  </div>                                                                                                                       
+      259 -                </div>                                                                                                                         
+      260 -                                                                                                                                               
+      261 -                <p className="text-[10px] text-zinc-600 font-medium italic mt-8 border-l border-zinc-900 pl-4">                                
+      262 -                  * No production environments were harmed during the planning of this event.                                                  
+      263 -                </p>                                                                                                                           
+      264 -              </div>                                                                                                                           
+      265 -            </motion.div>                                                                                                                      
+      226            </div>
+      227
+      228            {/* Right Column: Event Info & Description */}
+
+● Now find the closing tag of the grid div and add the about section after it as full width:
+
+● Read 1 file (ctrl+o to expand)
+
+● Update(app\events\[id]\page.tsx)
+  ⎿  Added 34 lines
+      376            </div>
+      377
+      378          </div>
+      379 +                                                                                                                                               
+      380 +        {/* About Section — full width below the grid, never overlaps form */}                                                                 
+      381 +        <motion.div                                                                                                                            
+      382 +          initial={{ opacity: 0, y: 20 }}                                                                                                      
+      383 +          animate={{ opacity: 1, y: 0 }}                                                                                                       
+      384 +          transition={{ delay: 0.5 }}                                                                                                          
+      385 +          className="mt-16 pt-16 border-t border-zinc-900 space-y-8 max-w-3xl"                                                                 
+      386 +        >                                                                                                                                      
+      387 +          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full">                         
+      388 +            <div className="w-1.5 h-1.5 bg-100x-accent-primary rounded-full animate-pulse" />                                                  
+      389 +            <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">About the event</span>                                 
+      390 +          </div>                                                                                                                               
+      391 +                                                                                                                                               
+      392 +          <div className="prose prose-invert max-w-none">                                                                                      
+      393 +            <p className="text-xl text-zinc-300 leading-relaxed whitespace-pre-wrap font-medium">                                              
+      394 +              {event.description}                                                                                                              
+      395 +            </p>                                                                                                                               
+      396 +          </div>                                                                                                                               
+      397 +                                                                                                                                               
+      398 +          <div className="pt-8 border-t border-zinc-900 flex items-center gap-4">                                                              
+      399 +            <div className="w-12 h-12 bg-100x-accent-primary rounded-2xl flex items-center justify-center">                                    
+      400 +              <span className="text-black font-black text-sm">100x</span>                                                                      
+      401 +            </div>                                                                                                                             
+      402 +            <div>                                                                                                                              
+      403 +              <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Hosted by</p>                                            
+      404 +              <p className="font-bold text-white">100x community member</p>                                                                    
+      405 +            </div>                                                                                                                             
+      406 +          </div>                                                                                                                               
+      407 +                                                                                                                                               
+      408 +          <p className="text-[10px] text-zinc-600 font-medium italic border-l border-zinc-900 pl-4">                                           
+      409 +            * No production environments were harmed during the planning of this event.                                                        
+      410 +          </p>                                                                                                                                 
+      411 +        </motion.div>                                                                                                                          
+      412 +                                                                                                                                               
+      413        </main>
+      414
+      415        {/* Footer / Copyright */}
+
+● Bash(cd /c/Users/visha/Downloads/Coomuntiy_Event && npx tsc --noEmit 2>&1)
+  ⎿  (No output)
+  ⎿  (timeout 1m)
+
+● Clean. Here's what changed:
+
+  Before:
+  [Desktop]                    [Mobile]
+  Image    | Event Info        Image
+  About    | Registration      About         <- blocked reg form
+           |                  Event Info
+                               Registration  <- user had to scroll past about
+
+  After:
+  [Desktop]                    [Mobile]
+  Image    | Event Info        Image
+           | Registration      Event Info
+  ─────────────────────        Registration
+  About (full width below)     ─────────────
+                               About (below)
+
+  The about section now sits cleanly below the grid on both desktop and mobile — it can never overlap or be pushed behind the form. On mobile, the user   
+  sees image → event details → pay/register → then reads the description if interested. Better UX too.

@@ -25,6 +25,7 @@ export async function GET(
         venue_address,
         max_capacity,
         current_registrations,
+        price,
         status,
         created_at,
         event_image_url,

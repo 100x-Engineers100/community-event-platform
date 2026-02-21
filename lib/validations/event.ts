@@ -28,7 +28,10 @@ export const eventFormSchema = z.object({
     .min(5, 'Minimum capacity is 5')
     .max(500, 'Maximum capacity is 500'),
 
-  event_image_url: z.string().optional()
+  event_image_url: z.string().optional(),
+
+  // Admin-only: price in paise (0 = free, 50000 = Rs.500)
+  price: z.number().min(0).optional()
 })
   .superRefine((data, ctx) => {
     // Online: requires meeting_link

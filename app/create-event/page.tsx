@@ -28,6 +28,7 @@ export default function CreateEventPage() {
   const [error, setError] = useState<string | null>(null)
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   const [userId, setUserId] = useState<string | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   // Randomized default images
   const defaultImages = [
@@ -64,6 +65,12 @@ export default function CreateEventPage() {
         router.push('/login')
       } else {
         setUserId(user.id)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', user.id)
+          .single()
+        setIsAdmin(profile?.is_admin === true)
         setIsCheckingAuth(false)
       }
     }
@@ -243,6 +250,35 @@ export default function CreateEventPage() {
                     You can cap registrations if needed.
                   </p>
                 </div>
+
+                {/* Price field - admin only */}
+                {isAdmin && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="space-y-2"
+                  >
+                    <Label htmlFor="price" className="text-100x-accent-primary text-xs uppercase tracking-wider font-semibold">
+                      Event Price (Admin only)
+                    </Label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 font-bold text-sm">Rs.</span>
+                      <Input
+                        id="price"
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        {...register('price', {
+                          setValueAs: (v) => (v === '' || v === undefined) ? 0 : Math.round(parseFloat(v) * 100)
+                        })}
+                        className="h-12 bg-zinc-900 border-100x-accent-primary/30 focus:border-100x-accent-primary text-base pl-12"
+                      />
+                    </div>
+                    <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
+                      Enter 0 for free events. Amount in INR. Attendees pay via Razorpay.
+                    </p>
+                  </motion.div>
+                )}
               </div>
             </div>
 

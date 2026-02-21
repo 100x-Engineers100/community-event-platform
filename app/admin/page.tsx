@@ -23,7 +23,8 @@ import {
   Zap,
   LayoutDashboard,
   Sparkles,
-  ArrowUpRight
+  ArrowUpRight,
+  PlusCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -231,21 +232,38 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent className="space-y-4 pt-4 relative z-10">
                 <Button
-                  onClick={() => router.push('/admin/pending')}
+                  onClick={() => router.push('/create-event')}
                   className="w-full h-14 bg-100x-accent-primary hover:bg-100x-accent-primary/90 text-black font-black rounded-2xl group/btn overflow-hidden relative"
-                  disabled={!stats?.pending}
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2">
-                    Review Pending
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+                    <PlusCircle className="w-4 h-4" />
+                    Create Event
                   </span>
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300" />
                 </Button>
 
                 <Button
+                  onClick={() => router.push('/admin/pending')}
+                  variant="ghost"
+                  className="w-full h-14 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl border border-white/5 flex items-center justify-between px-6"
+                  disabled={!stats?.pending}
+                >
+                  <div className="flex items-center gap-3">
+                    <Hourglass className="w-5 h-5 text-zinc-500" />
+                    <span>Review Pending</span>
+                    {stats?.pending ? (
+                      <span className="px-2 py-0.5 bg-100x-accent-primary/20 text-100x-accent-primary text-xs font-black rounded-full">
+                        {stats.pending}
+                      </span>
+                    ) : null}
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-zinc-700" />
+                </Button>
+
+                <Button
                   onClick={() => router.push('/admin/cron')}
                   variant="ghost"
-                  className="w-full h-14 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl border border-white/5 flex items-center justify-between px-6 px-4"
+                  className="w-full h-14 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl border border-white/5 flex items-center justify-between px-6"
                 >
                   <div className="flex items-center gap-3">
                     <Server className="w-5 h-5 text-zinc-500" />
