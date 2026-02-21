@@ -1,7 +1,5 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export interface ConfirmationEmailData {
   attendee_name: string
   attendee_email: string
@@ -17,6 +15,7 @@ export interface ConfirmationEmailData {
 }
 
 export async function sendConfirmationEmail(data: ConfirmationEmailData): Promise<void> {
+  const resend = new Resend(process.env.RESEND_API_KEY)
   try {
     const { error } = await resend.emails.send({
       from: '100xEngineers <community@100xbuilders.com>',
