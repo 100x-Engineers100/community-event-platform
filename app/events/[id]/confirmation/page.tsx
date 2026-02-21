@@ -217,8 +217,21 @@ export default function ConfirmationPage() {
                     <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-wider">Location</p>
                     <p className="font-bold flex items-center gap-2">
                       {event.location_type === 'online' ? <Globe className="w-4 h-4 text-100x-accent-primary" /> : <MapPin className="w-4 h-4 text-100x-accent-primary" />}
-                      {event.location_type === 'online' ? 'Online event' : (event.city || 'In-Person Event')}
+                      {event.location_type === 'online'
+                      ? 'Online event'
+                      : [event.venue_address, event.city].filter(Boolean).join(', ') || 'In-Person Event'}
                     </p>
+                    {(event.location_type === 'offline' || event.location_type === 'hybrid') && event.venue_address && (
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([event.venue_address, event.city].filter(Boolean).join(', '))}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-100x-accent-primary hover:underline mt-1"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        Open in Google Maps
+                      </a>
+                    )}
                   </div>
                 </div>
 
@@ -311,9 +324,14 @@ export default function ConfirmationPage() {
         </div>
 
         {/* Footer Note */}
-        <p className="text-center text-zinc-600 text-sm font-big">
-          Add event to your calendar for future reference or Save the meeting link.
-        </p>
+        <div className="text-center space-y-2">
+          <div className="inline-flex items-center gap-2 px-5 py-3 bg-zinc-900 border border-zinc-800 rounded-2xl">
+            <Mail className="w-4 h-4 text-100x-accent-primary flex-shrink-0" />
+            <p className="text-sm text-zinc-300 font-medium">
+              A confirmation email with all event details has been sent to <span className="text-white font-bold">{registration.attendee_email}</span>
+            </p>
+          </div>
+        </div>
 
         {/* Back navigation */}
         <div className="text-center">
@@ -329,7 +347,7 @@ export default function ConfirmationPage() {
 
         {/* Small reassurance line */}
         <p className="text-center text-xs text-zinc-600 font-medium">
-          You’ll also receive event updates on email or WhatsApp if required.
+          Check your inbox (and spam folder) for the confirmation email.
         </p>
       </div>
 
