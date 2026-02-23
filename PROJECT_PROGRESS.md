@@ -1,3 +1,41 @@
+ also amke sure that pending payment person or teh perosn who filled the rsvp form and thne went fro payment but didnt do it , should not be tored in db , so that  
+  he can try agin after filling teh details in teh form agina, but also make sure taht dupliction should not happen and  
+
+❯ hey that is done, now it is production. now a small problem , lets imagine when a user fills teh paymnet form and now      
+  gets redirceted to razorpay widow for actual paymnet but he didnt complete the paymnet and closes the razorpay window and  
+  gets back on the event id page where the paynet form is, now the main problem comes  
+
+
+
+
+### Post-Launch Security (Priority: High - do within 1 week of launch)
+- [ ] Rate limiting on /api/events/[id]/register and /api/events/[id]/create-order
+      Fix: Cloudflare Turnstile (free, invisible to users) on registration + payment forms
+      Risk without it: Bot can fill event capacity with fake emails, blocking real users
+- [ ] Payment recovery endpoint GET /api/events/[id]/payment-status?order_id=xxx
+      Fix: If user network drops after Razorpay deducts money but before verify-payment runs,
+      add a "Check my payment" button in PaymentForm catch block that hits this endpoint,
+      checks Razorpay directly, and marks registration as paid if confirmed
+      Risk without it: Webhook handles ~95% of cases automatically; 5% need manual DB fix
+
+  What you need to do manually this week since the bot fix isn't built yet:
+
+  Every day, run this query in Supabase SQL editor:
+  SELECT attendee_email, COUNT(*)
+  FROM registrations
+  WHERE registered_at > now() - interval '24 hours'
+  GROUP BY attendee_email
+  HAVING COUNT(*) > 2;
+  If you see the same email registered for multiple events — that's normal. If you see 10+ registrations from one email — something's wrong.
+
+  Also check for stuck payments:
+  SELECT * FROM registrations
+  WHERE payment_status = 'pending'
+  AND registered_at < now() - interval '1 hour';
+  Any rows here = user paid but webhook failed. Fix manually by setting payment_status = 'paid' for those rows.
+
+---
+
 # 100x Engineers Community Events Platform
 ## Project Progress Report
 
@@ -862,8 +900,6 @@ Final testing, optimization, and deployment.
 - [ ] Add unit tests for utility functions
 - [ ] Implement proper logging strategy
 - [ ] Add rate limiting to API routes
-
----
 
 ## PROJECT METRICS
 

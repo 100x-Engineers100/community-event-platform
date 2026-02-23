@@ -56,7 +56,7 @@ export function Navigation({ user, showSignIn = true, actions }: NavigationProps
                 <span className="text-white font-bold text-base">100x</span>
               </div>
               <span className="font-bold text-100x-text-primary text-lg hidden sm:inline transition-all group-hover:text-100x-accent-primary group-hover:drop-shadow-[0_0_8px_rgba(249,104,70,0.3)]">
-                Community Events
+                Builder's Hub
               </span>
             </Link>
 

@@ -164,7 +164,7 @@ function buildEmailHTML(data: ConfirmationEmailData): string {
               Registration Confirmed
             </h1>
             <p style="margin:0;color:${TEXT_MID};font-family:Roboto,Arial,Helvetica,sans-serif;font-size:15px;font-weight:400;">
-              Your spot is locked in. See you there.
+              Your spot is locked in. Come ready to learn, build, and meet the people behind 100x. See you there!
             </p>
           </td>
         </tr>

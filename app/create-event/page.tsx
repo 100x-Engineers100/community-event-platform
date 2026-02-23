@@ -82,10 +82,16 @@ export default function CreateEventPage() {
       setIsSubmitting(true)
       setError(null)
 
+      // Convert price from rupees (what admin typed) to paise for storage/Razorpay
+      const payload = {
+        ...data,
+        price: Math.round((data.price ?? 0) * 100)
+      }
+
       const response = await fetch('/api/host/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify(payload)
       })
 
       const result = await response.json()
@@ -115,8 +121,13 @@ export default function CreateEventPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-100x-accent-primary/30">
-      <div className="max-w-[1200px] mx-auto px-4 py-8 md:py-12">
+    <div className="min-h-screen bg-black text-white selection:bg-100x-accent-primary/30 relative overflow-hidden">
+      {/* Orange Glow Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-500/15 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-orange-600/15 blur-[150px] rounded-full" />
+      </div>
+      <div className="max-w-[1200px] mx-auto px-4 py-8 md:py-12 relative z-10">
         {/* Navigation */}
         <Link
           href="/dashboard"
@@ -208,9 +219,9 @@ export default function CreateEventPage() {
                     <div className="flex justify-between items-center">
                       <p className={cn(
                         "text-[10px] font-medium uppercase tracking-tighter",
-                        description.length < 50 || description.length > 1000 ? "text-red-400" : "text-zinc-500"
+                        description.length < 50 || description.length > 2000 ? "text-red-400" : "text-zinc-500"
                       )}>
-                        {description.length} / 1000 characters
+                        {description.length} / 2000 characters
                       </p>
                       {errors.description && (
                         <p className="text-red-400 text-xs font-medium">{errors.description.message}</p>
@@ -268,9 +279,7 @@ export default function CreateEventPage() {
                         type="number"
                         min="0"
                         placeholder="0"
-                        {...register('price', {
-                          setValueAs: (v) => (v === '' || v === undefined) ? 0 : Math.round(parseFloat(v) * 100)
-                        })}
+                        {...register('price', { valueAsNumber: true })}
                         className="h-12 bg-zinc-900 border-100x-accent-primary/30 focus:border-100x-accent-primary text-base pl-12"
                       />
                     </div>

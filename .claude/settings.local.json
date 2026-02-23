@@ -18,7 +18,8 @@
       "WebFetch(domain:razorpay.com)",
       "WebFetch(domain:medium.com)",
       "WebFetch(domain:hisalman.in)",
-      "WebFetch(domain:resend.com)"
+      "WebFetch(domain:resend.com)",
+      "Bash(grep:*)"
     ]
   }
 }

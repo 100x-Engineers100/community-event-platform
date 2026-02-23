@@ -74,7 +74,7 @@ export default function Home() {
 
               <h1 className="text-6xl md:text-6xl font-black leading-[0.9] tracking-tighter">
                 100x <br />
-                <span className="text-100x-accent-primary">Community Events</span>
+                <span className="text-100x-accent-primary">Builder's Hub</span>
               </h1>
 
               <p className="text-zinc-400 text-base md:text-1xl max-w-md font-mono leading-relaxed">
@@ -342,7 +342,7 @@ export default function Home() {
             Built for the 100x Engineers Community
           </p>
           <p className="text-[8px] font-bold text-zinc-800 uppercase tracking-widest mt-4">
-            © {new Date().getFullYear()} No Rights Reserved. Just Code.
+            © {new Date().getFullYear()} 100x Engineers. All rights reserved.
           </p>
         </div>
       </footer>

@@ -374,10 +374,15 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-100x-accent-primary/30">
+    <div className="min-h-screen bg-black text-white selection:bg-100x-accent-primary/30 relative overflow-hidden">
+      {/* Orange Glow Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-500/15 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-orange-600/15 blur-[150px] rounded-full" />
+      </div>
       <Navigation showSignIn={false} />
 
-      <main className="container mx-auto px-4 pt-32 pb-16 max-w-7xl">
+      <main className="container mx-auto px-4 pt-32 pb-16 max-w-7xl relative z-10">
         {/* Header Section */}
         <div className="mb-16 relative">
           <motion.div

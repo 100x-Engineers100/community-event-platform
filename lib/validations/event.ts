@@ -8,7 +8,7 @@ export const eventFormSchema = z.object({
 
   description: z.string()
     .min(50, 'Description must be at least 50 characters')
-    .max(1000, 'Description must be less than 1000 characters'),
+    .max(2000, 'Description must be less than 2000 characters'),
 
   event_date: z.string()
     .refine((date) => {
@@ -30,7 +30,7 @@ export const eventFormSchema = z.object({
 
   event_image_url: z.string().optional(),
 
-  // Admin-only: price in paise (0 = free, 50000 = Rs.500)
+  // Admin-only: price in rupees (0 = free, 500 = Rs.500). Converted to paise before API call.
   price: z.number().min(0).optional()
 })
   .superRefine((data, ctx) => {

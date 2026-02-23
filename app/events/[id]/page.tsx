@@ -131,9 +131,9 @@ export default function EventDetailPage() {
   const formattedTime = format(istDate, 'h:mm a')
 
   const locationIcon = {
-    online: <Globe className="w-5 h-5" />,
-    offline: <Building2 className="w-5 h-5" />,
-    hybrid: <MapPin className="w-5 h-5" />
+    online: <Globe className="w-6 h-6" />,
+    offline: <MapPin className="w-6 h-6" />,
+    hybrid: <MapPin className="w-6 h-6" />
   }
 
   const isFull = event.current_registrations >= event.max_capacity
@@ -141,7 +141,12 @@ export default function EventDetailPage() {
   const isPastEvent = event.status === 'completed' || isDatePast
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-100x-accent-primary/30">
+    <div className="min-h-screen bg-black text-white selection:bg-100x-accent-primary/30 relative overflow-hidden">
+      {/* Orange Glow Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-500/15 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-orange-600/15 blur-[150px] rounded-full" />
+      </div>
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-4 pointer-events-none">
         <div className="max-w-[1200px] mx-auto flex items-center justify-between pointer-events-auto">
@@ -249,55 +254,48 @@ export default function EventDetailPage() {
                 </h1>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-8 p-8 rounded-[32px] bg-zinc-900/40 border border-zinc-800/50">
+              <div className="grid sm:grid-cols-2 gap-8 p-8 rounded-[40px] bg-zinc-900/40 backdrop-blur-xl border border-white/5 relative overflow-hidden group">
+                {/* Decoration */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-orange-500/10 transition-colors duration-700" />
+
                 {/* Date & Time */}
-                <div className="space-y-6">
+                <div className="space-y-6 relative z-10">
                   <div className="flex gap-4">
-                    <div className="w-12 h-12 bg-white/5 rounded-2xl flex flex-col items-center justify-center border border-white/10">
-                      <span className="text-[10px] font-bold text-zinc-500 uppercase">{format(istDate, 'MMM')}</span>
-                      <span className="text-lg font-black leading-none">{format(istDate, 'd')}</span>
+                    <div className="w-14 h-14 bg-white/5 rounded-2xl flex flex-col items-center justify-center border border-white/10 shadow-inner group-hover:border-white/20 transition-colors">
+                      <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{format(istDate, 'MMM')}</span>
+                      <span className="text-xl font-black text-white leading-none">{format(istDate, 'd')}</span>
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1 py-1">
+                      <p className="text-sm font-black text-zinc-500 uppercase tracking-widest">When</p>
                       <p className="font-bold text-white leading-tight">
-                        {formattedDate}, {formattedYear}
-                      </p>
-                      <p className="text-sm font-medium text-zinc-500">
-                        Starting at {formattedTime} IST
+                        {formattedDate}, {formattedTime}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex gap-4">
-                    <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 text-100x-accent-primary">
+                    <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 text-100x-accent-primary group-hover:border-100x-accent-primary/20 transition-colors">
                       {locationIcon[event.location_type]}
                     </div>
-                    <div className="space-y-1 text-zinc-400">
+                    <div className="space-y-1 py-1">
+                      <p className="text-sm font-black text-zinc-500 uppercase tracking-widest">Where</p>
                       <p className="font-bold text-white capitalize leading-tight">
-                        {event.location_type === 'online' ? 'Virtual Event' : (event.city || 'In-Person')}
-                      </p>
-                      <p className="text-sm font-medium">
-                        {event.location_type === 'online'
-                          ? 'Joining link upon registration'
-                          : event.price > 0
-                            ? 'Exact venue shared in confirmation email after payment'
-                            : (event.venue_address || 'Address visible to registered guests')}
+                        {event.location_type === 'online' ? 'Virtual Session' : (event.city || 'In-Person')}
                       </p>
                     </div>
                   </div>
                 </div>
 
                 {/* Quick Stats */}
-                <div className="space-y-6 border-t sm:border-t-0 sm:border-l border-zinc-800/50 pt-6 sm:pt-0 sm:pl-8">
+                <div className="space-y-6 relative z-10 border-t sm:border-t-0 sm:border-l border-white/5 pt-6 sm:pt-0 sm:pl-8">
                   <div className="flex gap-4">
-                    <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 text-zinc-400">
-                      <Users className="w-5 h-5" />
+                    <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 text-emerald-400 group-hover:border-emerald-400/20 transition-colors">
+                      <Users className="w-6 h-6" />
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1 py-1">
+                      <p className="text-sm font-black text-zinc-500 uppercase tracking-widest">Attendance</p>
                       <p className="font-bold text-white leading-tight">
-                        {event.current_registrations} / {event.max_capacity}
-                      </p>
-                      <p className="text-sm font-medium text-zinc-500">
-                        Guests Registered
+                        {event.current_registrations} / {event.max_capacity} Slots
                       </p>
                     </div>
                   </div>
@@ -395,13 +393,13 @@ export default function EventDetailPage() {
             </p>
           </div>
 
-          <div className="pt-8 border-t border-zinc-900 flex items-center gap-4">
-            <div className="w-12 h-12 bg-100x-accent-primary rounded-2xl flex items-center justify-center">
-              <span className="text-black font-black text-sm">100x</span>
+          <div className="pt-8 border-t border-white/5 flex items-center gap-6 group/host">
+            <div className="w-16 h-16 bg-gradient-to-br from-100x-accent-primary/20 to-orange-500/20 rounded-[24px] flex items-center justify-center border border-100x-accent-primary/20 group-hover/host:border-100x-accent-primary/50 transition-all duration-500 shadow-xl shadow-orange-500/5">
+              <span className="text-100x-accent-primary font-black text-lg tracking-tighter">100x</span>
             </div>
             <div>
-              <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Hosted by</p>
-              <p className="font-bold text-white">100x community member</p>
+              <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-1">Authenticated Host</p>
+              <p className="text-xl font-black text-white group-hover/host:text-100x-accent-primary transition-colors">100x Admin</p>
             </div>
           </div>
 

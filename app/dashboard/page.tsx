@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { Profile, Event } from '@/lib/types'
 import { DashboardEmptyState } from '@/components/dashboard/DashboardEmptyState'
 import { ShimmerButton } from '@/components/ui/shimmer-button'
+import ShaderBackground from '@/components/ui/shader-background'
 
 async function getDashboardData() {
   const supabase = await createClient()
@@ -67,14 +68,22 @@ export default async function DashboardPage() {
   const hasEvents = events.length > 0
 
   return (
-    <div className="min-h-screen bg-black selection:bg-100x-accent-primary/30">
+    <div className="min-h-screen bg-black selection:bg-100x-accent-primary/30 relative overflow-hidden">
+      {/* Orange Glow Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-500/15 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-orange-600/15 blur-[150px] rounded-full" />
+      </div>
       <Navigation user={profile} />
 
-      <main className="container mx-auto px-4 py-8 pt-24 max-w-7xl space-y-12">
+      <main className="container mx-auto px-4 py-8 pt-24 max-w-7xl space-y-12 relative z-10">
         {/* Welcome Hero */}
         <section className="relative">
           <Card className="w-full h-[500px] bg-zinc-900 backdrop-blur-3xl relative overflow-hidden border-zinc-800 rounded-[40px] group shadow-2xl">
-            {/* Simple Gradient Background */}
+            {/* Shader Animation Background */}
+            <ShaderBackground className="absolute inset-0 opacity-40" />
+
+            {/* Simple Gradient Background Overlay */}
             <div className="absolute inset-0 bg-gradient-to-br from-100x-accent-primary/10 via-transparent to-transparent opacity-50" />
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-100x-accent-primary/20 via-transparent to-transparent" />
 
