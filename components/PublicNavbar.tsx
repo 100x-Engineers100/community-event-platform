@@ -33,7 +33,7 @@ export function PublicNavbar() {
                 <span className="text-white font-bold text-base">100x</span>
               </div>
               <span className="font-bold text-100x-text-primary text-lg hidden sm:inline transition-colors group-hover:text-100x-accent-primary">
-                Builder's Hub
+                Builders' Hub
               </span>
             </Link>
 

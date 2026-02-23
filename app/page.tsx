@@ -74,7 +74,7 @@ export default function Home() {
 
               <h1 className="text-6xl md:text-6xl font-black leading-[0.9] tracking-tighter">
                 100x <br />
-                <span className="text-100x-accent-primary">Builder's Hub</span>
+                <span className="text-100x-accent-primary">Builders' Hub</span>
               </h1>
 
               <p className="text-zinc-400 text-base md:text-1xl max-w-md font-mono leading-relaxed">
